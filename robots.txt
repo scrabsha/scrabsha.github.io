@@ -1,0 +1,2 @@
+User-agent: *
+Sitemap: https://scrabsha.github.io/sitemap.xml
