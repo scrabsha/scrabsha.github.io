@@ -1,6 +1,7 @@
 +++
 title = "A better cargo-readme - Issue 0: Humble Beginning"
 date = 2021-12-06
+updated = 2021-12-08
 +++
 
 # Introduction
@@ -205,19 +206,16 @@ The JSON document follows a specific structure defined in the `rustdoc_json_type
 
 ## Extracting the crate-level documentation
 
-After a few minutes of diving in the data structures, we can see that all the items that are reachable from the crate are located in the [`index`] field. This field is a JSON dictionary whose keys are the compiler-generated [`DefId`] and values are metadata of the reachable items. Looking at the documentation of the [`def_id`] module tells us that we should look at the crate id 0. After some researches, it turns out that the crate-level documentation are available at for the [`DefId`] "0:0".
-
-I think that the second 0 comes from the order in which the different items of a crate are lowered by Rustc, but that's another story.
+After a few minutes of diving in the data structures, we can see that all the items that are reachable from the crate are located in the [`index`] field. This field is a JSON dictionary whose keys are compiler-generated [`Id`]s and values are metadata of the reachable items. Additionally, there is a [`root`] field, which tells us which key in the index map will give us the documentation for the crate's root module.
 
 Let's try to write a command which extracts the crate-level documentation using `jq`:
 
-
+[`Id`]: https://doc.rust-lang.org/nightly/nightly-rustc/rustdoc_json_types/struct.Id.html
+[`root`]: https://doc.rust-lang.org/nightly/nightly-rustc/rustdoc_json_types/struct.Crate.html#structfield.root
 [`index`]: https://doc.rust-lang.org/nightly/nightly-rustc/rustdoc_json_types/struct.Crate.html#structfield.index
-[`DefId`]: https://doc.rust-lang.org/nightly/nightly-rustc/rustc_hir/def_id/struct.DefId.html
-[`def_id`]: https://doc.rust-lang.org/nightly/nightly-rustc/rustc_hir/def_id/index.html
 
 ```
-$ cat target/doc/abcr_step0.json | jq '{ docs: .index."0:0".docs }'
+$ cat target/doc/abcr_step0.json | jq '{docs: .index[.root].docs}'
 {
   "docs": "# My crate\n\nThe [`Cow`] says moo 🐮\n\n```TOML\n[dependencies]\nabcr_step0 = \"0.1.0\"\n```\n\nHere's some crate-level documentation"
 }
@@ -233,7 +231,7 @@ We did it! We managed to extract the crate documentation from the rustdoc-genera
 [`links`]: https://doc.rust-lang.org/nightly/nightly-rustc/rustdoc_json_types/struct.Item.html#structfield.links
 
 ```
-$ cat target/doc/abcr_step0.json | jq '{ docs: .index."0:0".docs, links: .index."0:0".links }'
+$ cat target/doc/abcr_step0.json | jq '{ docs: .index[.root].docs, links: .index[.root].links }'
 {
   "docs": "# My crate\n\n```TOML\n[dependencies]\nabcr_step0 = \"0.1.0\"\n```\n\nHere's some crate-level documentation\n\nHere's a link to [`Cow`].",
   "links": {
@@ -242,7 +240,7 @@ $ cat target/doc/abcr_step0.json | jq '{ docs: .index."0:0".docs, links: .index.
 }
 ```
 
-This returns the [`DefId`] of the [`Item`] that is linked. Let's see if we can retrieve its path:
+This returns the [`Id`] of the [`Item`] that is linked. Let's see if we can retrieve its path:
 
 ```
 $ cat target/doc/abcr_step0.json | jq '{ links_to_cow: .paths."5:546".path }'
@@ -270,5 +268,9 @@ This issue was reviewed by volunteers who gave me a lot of feedback. They are, i
   - [Mingwei Zhang 🦀](https://twitter.com/heymingwei),
   - [Natsukoh](https://twitter.com/natsukoow),
   - [Yozhgoor 🦀](https://twitter.com/yozhgoor).
+
+Initial release of the blogpost used a hardcoded `id` to retrieve the crate-level documentation. [@aDotInTheVoid] suggested to use the `root` field instead. Thanks!
+
+[@aDotInTheVoid]: https://github.com/aDotInTheVoid
 
 If you're interested in reviewing the next articles or implementation, don't hesitate to message me on Twitter. I gladly welcome any kind of constructive feedback.
