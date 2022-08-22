@@ -144,7 +144,7 @@ In Rust, the default recursion limit is 128. This means that the last call of `n
 
 Let's suppose we have an awesome compiler. It is running on bare metal, without any kernel that's consuming memory. There is no other process running in the background, all the memory is available. The compiler is so optimized that each token takes one byte of RAM.
 
-We would still need *\*waves in the air\** about 2<sup>128</sup> bytes of memory before being able to emit the recursion limit error. That's roughly 10<sup>100</sup> Gb of RAM. As a matter of fact, the laptop I'm writing this blogpost with has 16 Gb of RAM and that's enough for most of my work (looking at you, `tremor-runtime`).
+We would still need *\*waves in the air\** about 2<sup>128</sup> bytes of memory before being able to emit the recursion limit error. That's roughly 10<sup>100</sup> GB of RAM. As a matter of fact, the laptop I'm writing this blogpost with has 16 Gb of RAM and that's enough for most of my work (looking at you, `tremor-runtime`).
 
 Let's be honest. No developer on this planet has enough RAM on their computer to make this program fail to compile.
 
