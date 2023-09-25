@@ -25,3 +25,5 @@ author = "Sasha Pourcelot"
 
 copyright = "Written by Sasha Pourcelot, delivered under the [CC BY SA v4.0](https://creativecommons.org/licenses/by-sa/4.0/) license. Black Lives Matter."
 subtitle = "Some thoughts about my computer science journey"
+
+katex_enable = true
