@@ -13,11 +13,13 @@ build_search_index = false
 
 generate_feed = true
 
-highlight_code = true
-highlight_theme = "nord"
-
 # Theme
 theme = "zola-pickles"
+
+[markdown]
+highlight_code = true
+highlight_theme = "nord"
+render_emoji = true
 
 [extra]
 # Put all your custom variables here
