@@ -76,7 +76,7 @@ Compiling this emits the following error ([playground link]):
 
 [playground link]: https://play.rust-lang.org/?gist=30e50b882b3b373ceb3bd9b9a3ca31d9
 
-```text
+```
 error: this must repeat at least once
  --> src/main.rs:3:10
   |
