@@ -1,0 +1,515 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+	<title>S🦀sha&#x27;s blog</title>
+	<link href="https://scrabsha.github.io/atom.xml" rel="self" type="application/atom+xml"/>
+	<link href="https://scrabsha.github.io"/>
+	<generator uri="https://www.getzola.org/">Zola</generator>
+	<updated>2023-09-25T00:00:00+00:00</updated>
+	<id>https://scrabsha.github.io/atom.xml</id>
+	<entry xml:lang="en">
+		<title>The invisible macro transcriber constraint</title>
+		<published>2023-09-25T00:00:00+00:00</published>
+		<updated>2023-09-25T00:00:00+00:00</updated>
+		<link href="https://scrabsha.github.io/invisible-macro-transcriber-constraint/"/>
+		<link rel="alternate" href="https://scrabsha.github.io/invisible-macro-transcriber-constraint/" type="text/html"/>
+		<id>https://scrabsha.github.io/invisible-macro-transcriber-constraint/</id>
+		<content type="html">&lt;p&gt;&lt;em&gt;Disclaimer&lt;&#x2F;em&gt;: this post is rather small. I don&#x27;t have time to expand further.&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;introduction&quot;&gt;Introduction&lt;a class=&quot;zola-anchor&quot; href=&quot;#introduction&quot; aria-label=&quot;Anchor link for: introduction&quot;&gt;&lt;i class=&quot;fas fa-link&quot;&gt;&lt;&#x2F;i&gt;&lt;&#x2F;a&gt; 
+&lt;&#x2F;h1&gt;
+&lt;p&gt;I always described macro rules as a bunch of &amp;quot;tokens to tokens&amp;quot; functions.
+For instance, &lt;code&gt;rustdoc&lt;&#x2F;code&gt; generates the following documentation for &lt;code&gt;anyhow!&lt;&#x2F;code&gt;
+macro:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;rust&quot; style=&quot;background-color:#2e3440;color:#d8dee9;&quot; class=&quot;language-rust &quot;&gt;&lt;code class=&quot;language-rust&quot; data-lang=&quot;rust&quot;&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F; https:&#x2F;&#x2F;docs.rs&#x2F;anyhow&#x2F;1.0.75&#x2F;anyhow&#x2F;macro.anyhow.html
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;macro_rules! &lt;&#x2F;span&gt;&lt;span&gt;anyhow {
+&lt;&#x2F;span&gt;&lt;span&gt;    ($msg:literal &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;$&lt;&#x2F;span&gt;&lt;span&gt;(,)?) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;=&amp;gt; &lt;&#x2F;span&gt;&lt;span&gt;{ &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;... &lt;&#x2F;span&gt;&lt;span&gt;}&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;    ($err&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;:&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;expr $&lt;&#x2F;span&gt;&lt;span&gt;(,)?) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;=&amp;gt; &lt;&#x2F;span&gt;&lt;span&gt;{ &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;... &lt;&#x2F;span&gt;&lt;span&gt;}&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;    ($fmt&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;:&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;expr&lt;&#x2F;span&gt;&lt;span&gt;, &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;$&lt;&#x2F;span&gt;&lt;span&gt;($arg&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;:&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;tt&lt;&#x2F;span&gt;&lt;span&gt;)&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;*&lt;&#x2F;span&gt;&lt;span&gt;) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;=&amp;gt; &lt;&#x2F;span&gt;&lt;span&gt;{ &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;... &lt;&#x2F;span&gt;&lt;span&gt;}&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;I read the first rule as a function that generates &lt;em&gt;a piece of AST&lt;&#x2F;em&gt; from a
+literal. Likewise, I represented the second rule as a function that generates
+&lt;em&gt;a piece of AST&lt;&#x2F;em&gt; from an expression, and so on.&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;the-problem&quot;&gt;The problem&lt;a class=&quot;zola-anchor&quot; href=&quot;#the-problem&quot; aria-label=&quot;Anchor link for: the-problem&quot;&gt;&lt;i class=&quot;fas fa-link&quot;&gt;&lt;&#x2F;i&gt;&lt;&#x2F;a&gt; 
+&lt;&#x2F;h1&gt;
+&lt;p&gt;Let&#x27;s take a smaller example that better suits this blogpost:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;rust&quot; style=&quot;background-color:#2e3440;color:#d8dee9;&quot; class=&quot;language-rust &quot;&gt;&lt;code class=&quot;language-rust&quot; data-lang=&quot;rust&quot;&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;macro_rules! &lt;&#x2F;span&gt;&lt;span&gt;foo {
+&lt;&#x2F;span&gt;&lt;span&gt;    (&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;$&lt;&#x2F;span&gt;&lt;span&gt;($id&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;:&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;ident&lt;&#x2F;span&gt;&lt;span&gt;)&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;*&lt;&#x2F;span&gt;&lt;span&gt;) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;=&amp;gt; &lt;&#x2F;span&gt;&lt;span&gt;{ &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;... &lt;&#x2F;span&gt;&lt;span&gt;}&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;I read this rule as a function that generates &lt;em&gt;a piece of AST&lt;&#x2F;em&gt; from zero or more
+identifiers. In other words, the only repetition constraints are stated in the
+macro matcher itself.&lt;&#x2F;p&gt;
+&lt;p&gt;Well, well, well. WELL.&lt;&#x2F;p&gt;
+&lt;p&gt;I was wrong.&lt;&#x2F;p&gt;
+&lt;p&gt;It turns out that it is possible to add some repetition constraints in the macro
+transcriber itself. For instance, we can provide a transcriber that requires at
+least one identifier to be passed to our &lt;code&gt;foo&lt;&#x2F;code&gt; macro:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;rust&quot; style=&quot;background-color:#2e3440;color:#d8dee9;&quot; class=&quot;language-rust &quot;&gt;&lt;code class=&quot;language-rust&quot; data-lang=&quot;rust&quot;&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;macro_rules! &lt;&#x2F;span&gt;&lt;span&gt;foo {
+&lt;&#x2F;span&gt;&lt;span&gt;    (&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;$&lt;&#x2F;span&gt;&lt;span&gt;($id&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;:&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;ident&lt;&#x2F;span&gt;&lt;span&gt;)&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;*&lt;&#x2F;span&gt;&lt;span&gt;) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;=&amp;gt; &lt;&#x2F;span&gt;&lt;span&gt;{{
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;$&lt;&#x2F;span&gt;&lt;span&gt;( foo!(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;@&lt;&#x2F;span&gt;&lt;span&gt;discard $id)&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;; &lt;&#x2F;span&gt;&lt;span&gt;)&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;+ &lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F; &amp;lt;-- ⚠️
+&lt;&#x2F;span&gt;&lt;span&gt;    }}&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;    
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F; Don&amp;#39;t look at this - it&amp;#39;s just a clean way to discard tokens.
+&lt;&#x2F;span&gt;&lt;span&gt;    (@discard $tt&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;:&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;tt&lt;&#x2F;span&gt;&lt;span&gt;) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;=&amp;gt; &lt;&#x2F;span&gt;&lt;span&gt;{}
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;By using a &lt;code&gt;+&lt;&#x2F;code&gt; as a repetition operator in the transcription, we added a new
+constraint (there must be at least one identifier) that is not represented in
+the macro matcher (and not shown in &lt;code&gt;rustdoc&lt;&#x2F;code&gt;).&lt;&#x2F;p&gt;
+&lt;p&gt;Let&#x27;s test it with different amounts of identifiers:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;rust&quot; style=&quot;background-color:#2e3440;color:#d8dee9;&quot; class=&quot;language-rust &quot;&gt;&lt;code class=&quot;language-rust&quot; data-lang=&quot;rust&quot;&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;fn &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;main&lt;&#x2F;span&gt;&lt;span&gt;() {
+&lt;&#x2F;span&gt;&lt;span&gt;    foo!()&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;    foo!(a)&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;    foo!(a b)&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;    foo!(a b c)&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Compiling this emits the following error (&lt;a href=&quot;https:&#x2F;&#x2F;play.rust-lang.org&#x2F;?gist=30e50b882b3b373ceb3bd9b9a3ca31d9&quot;&gt;playground link&lt;&#x2F;a&gt;):&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2e3440;color:#d8dee9;&quot;&gt;&lt;code&gt;&lt;span&gt;error: this must repeat at least once
+&lt;&#x2F;span&gt;&lt;span&gt; --&amp;gt; src&#x2F;main.rs:3:10
+&lt;&#x2F;span&gt;&lt;span&gt;  |
+&lt;&#x2F;span&gt;&lt;span&gt;3 |         $( foo!(@discard $id); )+ &#x2F;&#x2F; &amp;lt;-- ⚠️
+&lt;&#x2F;span&gt;&lt;span&gt;  |          ^^^^^^^^^^^^^^^^^^^^^^^
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;This shows that the assumption that all the repetition constraints are stated in
+the macro matcher is wrong, which means that we can&#x27;t trust the documentation
+generated by &lt;code&gt;rustdoc&lt;&#x2F;code&gt; to tell if a macro invocation matches a given set of
+repetition constraints.&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;closing-thoughts-wait-no&quot;&gt;Closing thoughts (wait no)&lt;a class=&quot;zola-anchor&quot; href=&quot;#closing-thoughts-wait-no&quot; aria-label=&quot;Anchor link for: closing-thoughts-wait-no&quot;&gt;&lt;i class=&quot;fas fa-link&quot;&gt;&lt;&#x2F;i&gt;&lt;&#x2F;a&gt; 
+&lt;&#x2F;h1&gt;
+&lt;p&gt;This kind of pattern is quite easy to spot. It would be great to have a tool
+that checks that the repetition operator defined in the macro matcher matches
+the repetition operator defined in the macro transcriber. A tool with a silly
+pun in its name, with a huge picture of an American actor in its README.&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;community-feedback&quot;&gt;Community feedback&lt;a class=&quot;zola-anchor&quot; href=&quot;#community-feedback&quot; aria-label=&quot;Anchor link for: community-feedback&quot;&gt;&lt;i class=&quot;fas fa-link&quot;&gt;&lt;&#x2F;i&gt;&lt;&#x2F;a&gt; 
+&lt;&#x2F;h1&gt;
+&lt;p&gt;Somehow this article was reposted to the Rust Zulip, where more experienced
+people made interesting comments. Here&#x27;s a summary:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;There are other sources of constraints, which are not shown in the macro
+matcher either. For instance, a macro may expand to a macro call, which
+may have its own constraints.&lt;&#x2F;li&gt;
+&lt;li&gt;The &lt;code&gt;meta_variable_misuse&lt;&#x2F;code&gt; lint does pretty much what I wanted to implement
+at first. It is not enabled by default because it can lead to false
+positives and false negatives. More infos in
+&lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;rust-lang&#x2F;rust&#x2F;issues&#x2F;61053#issuecomment-509003694&quot;&gt;rust-lang&#x2F;rust#61053 (comment)&lt;&#x2F;a&gt;.&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+</content>
+	</entry>
+	<entry xml:lang="en">
+		<title>My favorite compiler is a memory hog</title>
+		<published>2022-08-22T00:00:00+00:00</published>
+		<updated>2022-08-22T00:00:00+00:00</updated>
+		<link href="https://scrabsha.github.io/my-favorite-compiler-is-a-memory-hog/"/>
+		<link rel="alternate" href="https://scrabsha.github.io/my-favorite-compiler-is-a-memory-hog/" type="text/html"/>
+		<id>https://scrabsha.github.io/my-favorite-compiler-is-a-memory-hog/</id>
+		<content type="html">&lt;p&gt;Alternative title: &lt;em&gt;why my program needs 1267650600228229401496703205376 gigabytes of RAM to (fail to) compile&lt;&#x2F;em&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Alternative&lt;sup&gt;2&lt;&#x2F;sup&gt; title: &lt;em&gt;Boring Coworker? Make Their Laptop Unresponsive For Fun And Profit&lt;&#x2F;em&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Alternative&lt;sup&gt;3&lt;&#x2F;sup&gt; title: &lt;em&gt;why recursion limit is not enough&lt;&#x2F;em&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Alternative&lt;sup&gt;4&lt;&#x2F;sup&gt; title: &lt;em&gt;recursion limit? We don&#x27;t do that here&lt;&#x2F;em&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;Alternative&lt;sup&gt;5&lt;&#x2F;sup&gt; title: &lt;em&gt;[see &lt;code&gt;Alternative title&lt;&#x2F;code&gt;]&lt;&#x2F;em&gt;&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;introduction&quot;&gt;Introduction&lt;a class=&quot;zola-anchor&quot; href=&quot;#introduction&quot; aria-label=&quot;Anchor link for: introduction&quot;&gt;&lt;i class=&quot;fas fa-link&quot;&gt;&lt;&#x2F;i&gt;&lt;&#x2F;a&gt; 
+&lt;&#x2F;h1&gt;
+&lt;p&gt;I love Rust declarative macros. They allow performing super elegant code transformations. They are so powerful that we can use them to parse literally anything, but their core syntax is so simple that one could write their first macro in less than an hour.&lt;&#x2F;p&gt;
+&lt;p&gt;The downside of this is that... well... these macros are &lt;em&gt;too&lt;&#x2F;em&gt; powerful. Once they get very complex, a single typo can take hours to be fixed. Even worse, it can drive your compiler crazy. Today, we&#x27;ll see how one can turn &lt;code&gt;rustc&lt;&#x2F;code&gt; into an unbounded memory allocator stresstest.&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;background-a-handful-of-cursed-macros&quot;&gt;Background - a handful of cursed macros&lt;a class=&quot;zola-anchor&quot; href=&quot;#background-a-handful-of-cursed-macros&quot; aria-label=&quot;Anchor link for: background-a-handful-of-cursed-macros&quot;&gt;&lt;i class=&quot;fas fa-link&quot;&gt;&lt;&#x2F;i&gt;&lt;&#x2F;a&gt; 
+&lt;&#x2F;h1&gt;
+&lt;p&gt;I won&#x27;t get into too many details there. I&#x27;ll present the actual macros in a later blogpost.&lt;&#x2F;p&gt;
+&lt;p&gt;At a very high level, this macro was recursive. It captured every token passed to it, processed the first tokens, and called itself again with the remaining, unprocessed tokens as arguments.&lt;&#x2F;p&gt;
+&lt;p&gt;We have a fancy word for this: &lt;a href=&quot;https:&#x2F;&#x2F;danielkeep.github.io&#x2F;tlborm&#x2F;book&#x2F;pat-incremental-tt-munchers.html&quot;&gt;TT muncher&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;guaranteeing-that-a-program-terminates&quot;&gt;Guaranteeing that a program terminates&lt;a class=&quot;zola-anchor&quot; href=&quot;#guaranteeing-that-a-program-terminates&quot; aria-label=&quot;Anchor link for: guaranteeing-that-a-program-terminates&quot;&gt;&lt;i class=&quot;fas fa-link&quot;&gt;&lt;&#x2F;i&gt;&lt;&#x2F;a&gt; 
+&lt;&#x2F;h1&gt;
+&lt;p&gt;It&#x27;s kinda easy to accidentally create code that never stops and just basically hangs the program. Some languages are designed so that the compiler can detect and reject any code which may hang the program. Rust designers decided it was ok to hang. Sometimes.&lt;&#x2F;p&gt;
+&lt;p&gt;In the whole lifetime of a Rust crate, there are two very distinct steps at which different pieces of code are run. At compile-time, the macros are expanded, while at runtime, macro-expanded Rust code is run.&lt;&#x2F;p&gt;
+&lt;p&gt;Macros in Rust are defined using a specific language that maps quite well to a purely functional programming language, where mutability and side effects are disallowed. As this language makes extensive use of recursion, there&#x27;s a very elegant way to make sure that macros expansion actually terminates: the compiler tries to expand the macro, but if too many recursions are performed, then it just stops, telling that some kind of limit has been reached. This way, we are guaranteed that macros eventually stop expanding, and nobody should ever write an overly specific blogpost about macros allocating memory indefinitely.&lt;&#x2F;p&gt;
+&lt;p&gt;Regular Rust code is... well... one &lt;code&gt;loop {}&lt;&#x2F;code&gt; away from hanging forever. Hanging at runtime is something we may want to happen. For instance, a REST backend may spend a few milliseconds waiting for an incoming request, dispatch it to a thread, and go back to its initial idle state.&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;getting-our-hands-dirty-with-macros&quot;&gt;Getting our hands dirty with macros&lt;a class=&quot;zola-anchor&quot; href=&quot;#getting-our-hands-dirty-with-macros&quot; aria-label=&quot;Anchor link for: getting-our-hands-dirty-with-macros&quot;&gt;&lt;i class=&quot;fas fa-link&quot;&gt;&lt;&#x2F;i&gt;&lt;&#x2F;a&gt; 
+&lt;&#x2F;h1&gt;
+&lt;p&gt;It is quite easy to write a function that never finishes: just replace its body with &lt;code&gt;loop {}&lt;&#x2F;code&gt;, and we&#x27;re good to go. Similarly, one can easily write a macro that calls itself.&lt;&#x2F;p&gt;
+&lt;p&gt;Something like (&lt;a href=&quot;https:&#x2F;&#x2F;play.rust-lang.org&#x2F;?version=stable&amp;amp;mode=debug&amp;amp;edition=2021&amp;amp;gist=789b24d0d3ddcfd4a1ce1c0617cea55b&quot;&gt;playground link&lt;&#x2F;a&gt;):&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;rust&quot; style=&quot;background-color:#2e3440;color:#d8dee9;&quot; class=&quot;language-rust &quot;&gt;&lt;code class=&quot;language-rust&quot; data-lang=&quot;rust&quot;&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;macro_rules! &lt;&#x2F;span&gt;&lt;span&gt;never_stops_compiling {
+&lt;&#x2F;span&gt;&lt;span&gt;    () &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;=&amp;gt; &lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;        never_stops_compiling!()
+&lt;&#x2F;span&gt;&lt;span&gt;    }&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;fn &lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;main&lt;&#x2F;span&gt;&lt;span&gt;() {
+&lt;&#x2F;span&gt;&lt;span&gt;    never_stops_compiling!()&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;One can then mentally figure out that expanding this call to &lt;code&gt;never_stops_compiling!&lt;&#x2F;code&gt; ends up indefinitely recursing. As a result, the recursion limit should be reached, and an error should be emitted. Let&#x27;s check this out:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2e3440;color:#d8dee9;&quot;&gt;&lt;code&gt;&lt;span&gt;error: recursion limit reached while expanding `never_stops_compiling!`
+&lt;&#x2F;span&gt;&lt;span&gt; --&amp;gt; src&#x2F;main.rs:3:9
+&lt;&#x2F;span&gt;&lt;span&gt;  |
+&lt;&#x2F;span&gt;&lt;span&gt;3 |         never_stops_compiling!()
+&lt;&#x2F;span&gt;&lt;span&gt;  |         ^^^^^^^^^^^^^^^^^^^^^^^^
+&lt;&#x2F;span&gt;&lt;span&gt;...
+&lt;&#x2F;span&gt;&lt;span&gt;8 |     never_stops_compiling!();
+&lt;&#x2F;span&gt;&lt;span&gt;  |     ------------------------ in this macro invocation
+&lt;&#x2F;span&gt;&lt;span&gt;  |
+&lt;&#x2F;span&gt;&lt;span&gt;  = help: consider increasing the recursion limit by adding a `#![recursion_limit = &amp;quot;256&amp;quot;]` attribute to your crate (`playground`)
+&lt;&#x2F;span&gt;&lt;span&gt;  = note: this error originates in the macro `never_stops_compiling` (in Nightly builds, run with -Z macro-backtrace for more info)
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;error: could not compile `playground` due to previous error
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;This means that the only way to make the compiler use &lt;em&gt;a lot&lt;&#x2F;em&gt; of memory using macros is to maximize the amount of work to perform at each recursion. This way, processing the macro call costs more and more resources to the host machine, making the compiler eventually hang.&lt;&#x2F;p&gt;
+&lt;p&gt;The most intuitive way to do this is to add a new token each time we recurse. Something like:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;rust&quot; style=&quot;background-color:#2e3440;color:#d8dee9;&quot; class=&quot;language-rust &quot;&gt;&lt;code class=&quot;language-rust&quot; data-lang=&quot;rust&quot;&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;macro_rules! &lt;&#x2F;span&gt;&lt;span&gt;never_stops_compiling {
+&lt;&#x2F;span&gt;&lt;span&gt;    ( &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;$&lt;&#x2F;span&gt;&lt;span&gt;( $input&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;:&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;tt &lt;&#x2F;span&gt;&lt;span&gt;)&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;* &lt;&#x2F;span&gt;&lt;span&gt;) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;=&amp;gt; &lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;        never_stops_compiling!( &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;$&lt;&#x2F;span&gt;&lt;span&gt;( $input )&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;* | &lt;&#x2F;span&gt;&lt;span&gt;)
+&lt;&#x2F;span&gt;&lt;span&gt;    }&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;This means that calling &lt;code&gt;never_stops_compiling&lt;&#x2F;code&gt; with no argument will yield to calling &lt;code&gt;never_stops_compiling!(|)&lt;&#x2F;code&gt;, which will itself trigger a call to &lt;code&gt;never_stops_compiling!(||)&lt;&#x2F;code&gt;, expanding to &lt;code&gt;never_stops_compiling!(|||)&lt;&#x2F;code&gt;, and so on, and so forth, adding one &lt;code&gt;|&lt;&#x2F;code&gt; at each recursion. As a result, memory usage increases somewhat linearly at each recursion.&lt;&#x2F;p&gt;
+&lt;p&gt;As our goal is to eat all the available RAM, we need to create as many tokens as possible before recursing, so that memory usage increases so quickly that &lt;code&gt;rustc&lt;&#x2F;code&gt; gets OOM killed &lt;em&gt;before&lt;&#x2F;em&gt; the recursion limit is reached. To do so, we need to create a lot of tokens, very quickly.&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;exponential-growth&quot;&gt;Exponential growth&lt;a class=&quot;zola-anchor&quot; href=&quot;#exponential-growth&quot; aria-label=&quot;Anchor link for: exponential-growth&quot;&gt;&lt;i class=&quot;fas fa-link&quot;&gt;&lt;&#x2F;i&gt;&lt;&#x2F;a&gt; 
+&lt;&#x2F;h1&gt;
+&lt;p&gt;&lt;em&gt;Disclaimer: this section briefly talks about Covid-19. Feel free to skip to the next section if necessary.&lt;&#x2F;em&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;This post is written in summer 2022. Covid-19 drastically changed our lives more than two years ago. I think everyone here heard at least once about exponential growth.&lt;&#x2F;p&gt;
+&lt;p&gt;When a value grows exponentially, this means that it is multiplied by some constant factor at each step. In epidemiology, we call this factor &lt;em&gt;R&lt;&#x2F;em&gt;. It can be interpreted as &amp;quot;each person who catches Covid transmits it to &lt;em&gt;R&lt;&#x2F;em&gt; people&amp;quot;. Our goal is to keep this value lower than 1.&lt;&#x2F;p&gt;
+&lt;p&gt;Exponential growth has a nice property. As long as we have &lt;em&gt;R &amp;gt; 1&lt;&#x2F;em&gt;, it is guaranteed to eventually grow faster than any polynomial value. This makes exponential growth a strong candidate for our memory hog.&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;gimme-gimme-gimme-tokens&quot;&gt;Gimme gimme gimme [tokens]&lt;a class=&quot;zola-anchor&quot; href=&quot;#gimme-gimme-gimme-tokens&quot; aria-label=&quot;Anchor link for: gimme-gimme-gimme-tokens&quot;&gt;&lt;i class=&quot;fas fa-link&quot;&gt;&lt;&#x2F;i&gt;&lt;&#x2F;a&gt; 
+&lt;&#x2F;h1&gt;
+&lt;p&gt;Let&#x27;s double the number of tokens passed at each invocation:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;rust&quot; style=&quot;background-color:#2e3440;color:#d8dee9;&quot; class=&quot;language-rust &quot;&gt;&lt;code class=&quot;language-rust&quot; data-lang=&quot;rust&quot;&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;macro_rules! &lt;&#x2F;span&gt;&lt;span&gt;never_stops_compiling {
+&lt;&#x2F;span&gt;&lt;span&gt;    ( &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;$&lt;&#x2F;span&gt;&lt;span&gt;( $input&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;:&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;tt &lt;&#x2F;span&gt;&lt;span&gt;)&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;* &lt;&#x2F;span&gt;&lt;span&gt;) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;=&amp;gt; &lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;        never_stops_compiling!(
+&lt;&#x2F;span&gt;&lt;span&gt;            &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;$&lt;&#x2F;span&gt;&lt;span&gt;( $input )&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;*
+&lt;&#x2F;span&gt;&lt;span&gt;            &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;$&lt;&#x2F;span&gt;&lt;span&gt;( $input )&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;*
+&lt;&#x2F;span&gt;&lt;span&gt;        )
+&lt;&#x2F;span&gt;&lt;span&gt;    }&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;We need to provide the initial &lt;code&gt;|&lt;&#x2F;code&gt; token so that it is actually repeated:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;rust&quot; style=&quot;background-color:#2e3440;color:#d8dee9;&quot; class=&quot;language-rust &quot;&gt;&lt;code class=&quot;language-rust&quot; data-lang=&quot;rust&quot;&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;macro_rules! &lt;&#x2F;span&gt;&lt;span&gt;never_stops_compiling {
+&lt;&#x2F;span&gt;&lt;span&gt;    () &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;=&amp;gt; &lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;        never_stops_compiling!( | )
+&lt;&#x2F;span&gt;&lt;span&gt;    }&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;    ( &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;$&lt;&#x2F;span&gt;&lt;span&gt;( $input&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;:&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;tt &lt;&#x2F;span&gt;&lt;span&gt;)&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;* &lt;&#x2F;span&gt;&lt;span&gt;) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;=&amp;gt; &lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;        never_stops_compiling!(
+&lt;&#x2F;span&gt;&lt;span&gt;            &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;$&lt;&#x2F;span&gt;&lt;span&gt;( $input )&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;*
+&lt;&#x2F;span&gt;&lt;span&gt;            &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;$&lt;&#x2F;span&gt;&lt;span&gt;( $input )&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;*
+&lt;&#x2F;span&gt;&lt;span&gt;        )
+&lt;&#x2F;span&gt;&lt;span&gt;    }&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;This means that expanding &lt;code&gt;never_stops_compiling!()&lt;&#x2F;code&gt; will give us &lt;code&gt;never_stops_commpiling!(|)&lt;&#x2F;code&gt;, which expands to &lt;code&gt;never_stops_compiling(||)&lt;&#x2F;code&gt;, which expands to &lt;code&gt;never_stops_compiling(||||)&lt;&#x2F;code&gt;, doubling the number of &lt;code&gt;|&lt;&#x2F;code&gt; at each recursion. As a result, there are 1024 &lt;code&gt;|&lt;&#x2F;code&gt; for rustc to store in the 10th recursion (or 11th, depending on if you want to be off-by-one or not).&lt;&#x2F;p&gt;
+&lt;p&gt;In Rust, the default recursion limit is 128. This means that the last call of &lt;code&gt;never_stops_compiling!&lt;&#x2F;code&gt; would pass 2&lt;sup&gt;128&lt;&#x2F;sup&gt; (or 2&lt;sup&gt;127&lt;&#x2F;sup&gt;) tokens before hitting the recursion limit.&lt;&#x2F;p&gt;
+&lt;p&gt;Let&#x27;s suppose we have an awesome compiler. It is running on bare metal, without any kernel that&#x27;s consuming memory. There is no other process running in the background, all the memory is available. The compiler is so optimized that each token takes one byte of RAM.&lt;&#x2F;p&gt;
+&lt;p&gt;We would still need &lt;em&gt;*waves in the air*&lt;&#x2F;em&gt; about 2&lt;sup&gt;128&lt;&#x2F;sup&gt; bytes of memory before being able to emit the recursion limit error. That&#x27;s roughly 10&lt;sup&gt;100&lt;&#x2F;sup&gt; GB of RAM. As a matter of fact, the laptop I&#x27;m writing this blogpost with has 16 GB of RAM and that&#x27;s enough for most of my work (looking at you, &lt;code&gt;tremor-runtime&lt;&#x2F;code&gt;).&lt;&#x2F;p&gt;
+&lt;p&gt;Let&#x27;s be honest. No developer on this planet has enough RAM on their computer to make this program fail to compile.&lt;&#x2F;p&gt;
+&lt;p&gt;Let&#x27;s see it in action:&lt;&#x2F;p&gt;
+&lt;span style=&quot;text-align:center&quot;&gt;
+&lt;p&gt;&lt;img src=&quot;https:&#x2F;&#x2F;scrabsha.github.io&#x2F;my-favorite-compiler-is-a-memory-hog&#x2F;ram-usage.png&quot; alt=&quot;If you can read this text, then there&#x27;s a broken link. The image is a graph showing a huge memory increase over time&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
+&lt;&#x2F;span&gt;
+&lt;p&gt;So yeah, that&#x27;s a lot of RAM.&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;how-did-we-get-here&quot;&gt;&lt;a href=&quot;https:&#x2F;&#x2F;minecraft.fandom.com&#x2F;wiki&#x2F;How_did_we_get_here%3F_(block)&quot;&gt;How did we get here?&lt;&#x2F;a&gt;&lt;a class=&quot;zola-anchor&quot; href=&quot;#how-did-we-get-here&quot; aria-label=&quot;Anchor link for: how-did-we-get-here&quot;&gt;&lt;i class=&quot;fas fa-link&quot;&gt;&lt;&#x2F;i&gt;&lt;&#x2F;a&gt; 
+&lt;&#x2F;h1&gt;
+&lt;p&gt;I have to confess something: I love declarative macros. Probably a bit too much. I love them so much that I often stay up very late at night, trying to write cursed macros which parses cursed things.&lt;&#x2F;p&gt;
+&lt;p&gt;I was writting a quite common TT muncher. It looked pretty much like:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;rust&quot; style=&quot;background-color:#2e3440;color:#d8dee9;&quot; class=&quot;language-rust &quot;&gt;&lt;code class=&quot;language-rust&quot; data-lang=&quot;rust&quot;&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;macro_rules! &lt;&#x2F;span&gt;&lt;span&gt;i_am_a_tt_muncher {
+&lt;&#x2F;span&gt;&lt;span&gt;    ( [ &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;$&lt;&#x2F;span&gt;&lt;span&gt;( $state&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;:&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;tt &lt;&#x2F;span&gt;&lt;span&gt;)&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;*&lt;&#x2F;span&gt;&lt;span&gt; ], let $var_name = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;$&lt;&#x2F;span&gt;&lt;span&gt;( $tail&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;:&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;tt &lt;&#x2F;span&gt;&lt;span&gt;)&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;* &lt;&#x2F;span&gt;&lt;span&gt;) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;=&amp;gt; &lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F; ... code to be written there ...
+&lt;&#x2F;span&gt;&lt;span&gt;    }&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;* Not shown: a lot of similar and unreadable match arms *&#x2F;
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;As I was a bit too tired, I wrote the following expansion code:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;rust&quot; style=&quot;background-color:#2e3440;color:#d8dee9;&quot; class=&quot;language-rust &quot;&gt;&lt;code class=&quot;language-rust&quot; data-lang=&quot;rust&quot;&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;macro_rules! &lt;&#x2F;span&gt;&lt;span&gt;i_am_a_tt_muncher {
+&lt;&#x2F;span&gt;&lt;span&gt;    ( [ &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;$&lt;&#x2F;span&gt;&lt;span&gt;( $state&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;:&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;tt &lt;&#x2F;span&gt;&lt;span&gt;)&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;*&lt;&#x2F;span&gt;&lt;span&gt; ], let $var_name = &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;$&lt;&#x2F;span&gt;&lt;span&gt;( $tail&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;:&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;tt &lt;&#x2F;span&gt;&lt;span&gt;)&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;* &lt;&#x2F;span&gt;&lt;span&gt;) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;=&amp;gt; &lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;        i_am_a_tt_muncher! {
+&lt;&#x2F;span&gt;&lt;span&gt;            [ &lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;* some new state *&#x2F; &lt;&#x2F;span&gt;&lt;span&gt;]&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;,
+&lt;&#x2F;span&gt;&lt;span&gt;            &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;let &lt;&#x2F;span&gt;&lt;span&gt;$var_name &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= $&lt;&#x2F;span&gt;&lt;span&gt;( $tail&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;:&lt;&#x2F;span&gt;&lt;span&gt;tt )&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;*
+&lt;&#x2F;span&gt;&lt;span&gt;        }
+&lt;&#x2F;span&gt;&lt;span&gt;    }&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;I was so tired that I rewrote the pattern and forgot two things:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;as we have processed the &lt;code&gt;let $var_name =&lt;&#x2F;code&gt;, we should not include it in the remaining input while recursing,&lt;&#x2F;li&gt;
+&lt;li&gt;we are expanding an additional &lt;code&gt;: tt&lt;&#x2F;code&gt; for each remaining token.&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;As a result, each time we were matching that one rule, we started infinitely recursing, multiplying the number of tokens to process by three at each recursion.&lt;&#x2F;p&gt;
+&lt;p&gt;I saved the file, rust-analyzer triggered a &lt;code&gt;cargo check&lt;&#x2F;code&gt;, which triggered a macro expansion of a unit test, which triggered an infinite macro recursion, which quickly ate all my computer&#x27;s RAM. Visual Studio Code started getting less and less responsive. One &lt;code&gt;killall rustc&lt;&#x2F;code&gt; later, my laptop came back to its original super beefy state. I had to reopen my crate with &lt;code&gt;vi&lt;&#x2F;code&gt; to diagnose and fix the problem.&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;final-thoughts&quot;&gt;Final thoughts&lt;a class=&quot;zola-anchor&quot; href=&quot;#final-thoughts&quot; aria-label=&quot;Anchor link for: final-thoughts&quot;&gt;&lt;i class=&quot;fas fa-link&quot;&gt;&lt;&#x2F;i&gt;&lt;&#x2F;a&gt; 
+&lt;&#x2F;h1&gt;
+&lt;p&gt;As they wanted to guarantee that declarative macros eventually stop expanding, the Rust designers added a recursion limit. This limit is great: if someone accidentally writes a macro that infinitely recurses, then the compilation halts and no CPU core gets indefinitely hurt in the process.&lt;&#x2F;p&gt;
+&lt;p&gt;However, this limit is not sufficient: while we are guaranteed that the compilation eventually finishes, we have no clue of how many resources are needed to actually get there.&lt;&#x2F;p&gt;
+&lt;p&gt;The only solution I can think of is to limit the number of tokens that can be passed to a macro. While it &lt;em&gt;technically&lt;&#x2F;em&gt; is a breaking change, this should not impact already-existing code if this limit is high enough.&lt;&#x2F;p&gt;
+</content>
+	</entry>
+	<entry xml:lang="en">
+		<title>Support for the ClickHouse database in Tremor</title>
+		<published>2022-07-05T00:00:00+00:00</published>
+		<updated>2022-07-05T00:00:00+00:00</updated>
+		<link href="https://scrabsha.github.io/lfx-mentorhip-db-connectors/"/>
+		<link rel="alternate" href="https://scrabsha.github.io/lfx-mentorhip-db-connectors/" type="text/html"/>
+		<id>https://scrabsha.github.io/lfx-mentorhip-db-connectors/</id>
+		<content type="html">&lt;p&gt;&lt;em&gt;This article was originally posted on &lt;a href=&quot;https:&#x2F;&#x2F;www.tremor.rs&#x2F;blog&#x2F;2022&#x2F;07&#x2F;07&#x2F;LFX-Blog-Sasha&quot;&gt;Tremor&#x27;s blog&lt;&#x2F;a&gt;.&lt;&#x2F;em&gt;&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;introduction&quot;&gt;Introduction&lt;a class=&quot;zola-anchor&quot; href=&quot;#introduction&quot; aria-label=&quot;Anchor link for: introduction&quot;&gt;&lt;i class=&quot;fas fa-link&quot;&gt;&lt;&#x2F;i&gt;&lt;&#x2F;a&gt; 
+&lt;&#x2F;h1&gt;
+&lt;p&gt;I&#x27;m Sasha, a Computer Science student living in south-eastern France. I contributed to Tremor as part of the &lt;a href=&quot;https:&#x2F;&#x2F;mentorship.lfx.linuxfoundation.org&#x2F;project&#x2F;5c828028-f91c-4969-b4de-9efdb27bb869&quot;&gt;Database Connector mentorship&lt;&#x2F;a&gt; proposed by the &lt;a href=&quot;https:&#x2F;&#x2F;lfx.linuxfoundation.org&#x2F;tools&#x2F;mentorship&#x2F;&quot;&gt;LFX Mentorship Program&lt;&#x2F;a&gt; for Spring 2022. I was mentored by Matthias Wahl and got help from Darach Ennis, Heinz Gies and Ramona Łuczkiewicz.&lt;&#x2F;p&gt;
+&lt;p&gt;This blogpost summarizes my work at Tremor as a mentee and shows what could be done next.&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;about-tremor&quot;&gt;About Tremor&lt;a class=&quot;zola-anchor&quot; href=&quot;#about-tremor&quot; aria-label=&quot;Anchor link for: about-tremor&quot;&gt;&lt;i class=&quot;fas fa-link&quot;&gt;&lt;&#x2F;i&gt;&lt;&#x2F;a&gt; 
+&lt;&#x2F;h1&gt;
+&lt;p&gt;Tremor is an event processing system with the goal of allowing users to handle a high volume of messages by viewing them as a stream flowing between different nodes of a graph. Events go in and out of this graph thanks to connectors.&lt;&#x2F;p&gt;
+&lt;p&gt;The interactions between each node and the connector configuration are defined using the &lt;a href=&quot;https:&#x2F;&#x2F;www.tremor.rs&#x2F;docs&#x2F;edge&#x2F;language&#x2F;&quot;&gt;&lt;code&gt;troy&lt;&#x2F;code&gt;&lt;&#x2F;a&gt; programming language.&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;abstract&quot;&gt;Abstract&lt;a class=&quot;zola-anchor&quot; href=&quot;#abstract&quot; aria-label=&quot;Anchor link for: abstract&quot;&gt;&lt;i class=&quot;fas fa-link&quot;&gt;&lt;&#x2F;i&gt;&lt;&#x2F;a&gt; 
+&lt;&#x2F;h1&gt;
+&lt;p&gt;My mentorship at Tremor was focused on building a connector for the &lt;a href=&quot;https:&#x2F;&#x2F;clickhouse.com&#x2F;&quot;&gt;ClickHouse&lt;&#x2F;a&gt; database engine. More specifically, I was focused on the &lt;em&gt;sink&lt;&#x2F;em&gt; part, the one that allows data to flow out of the Tremor application.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;a href=&quot;https:&#x2F;&#x2F;clickhouse.com&#x2F;&quot;&gt;ClickHouse&lt;&#x2F;a&gt; is a database management system designed to allow for real-time analysis of high volumes of non-aggregated data. Its initial goal was to power the Yandex.Metrica analytics platform.&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;the-clickhouse-connector&quot;&gt;The ClickHouse connector&lt;a class=&quot;zola-anchor&quot; href=&quot;#the-clickhouse-connector&quot; aria-label=&quot;Anchor link for: the-clickhouse-connector&quot;&gt;&lt;i class=&quot;fas fa-link&quot;&gt;&lt;&#x2F;i&gt;&lt;&#x2F;a&gt; 
+&lt;&#x2F;h1&gt;
+&lt;p&gt;The next subsections describe what I did during the mentorship.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;interacting-with-a-clickhouse-database-in-rust&quot;&gt;Interacting with a ClickHouse database in Rust&lt;a class=&quot;zola-anchor&quot; href=&quot;#interacting-with-a-clickhouse-database-in-rust&quot; aria-label=&quot;Anchor link for: interacting-with-a-clickhouse-database-in-rust&quot;&gt;&lt;i class=&quot;fas fa-link&quot;&gt;&lt;&#x2F;i&gt;&lt;&#x2F;a&gt; 
+&lt;&#x2F;h2&gt;
+&lt;p&gt;My first goal was to find a way to send requests to a ClickHouse node from a Rust program. It was a good start because it allowed me to experiment on the ClickHouse side without caring about what was happening in Tremor. I spent around three weeks playing on a separate repository named &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;scrabsha&#x2F;plays-with-clickhouse&quot;&gt;&lt;code&gt;scrabsha&#x2F;plays-with-clickhouse&lt;&#x2F;code&gt;&lt;&#x2F;a&gt; and getting extensive knowledge from Matthias about how Tremor works from the inside.&lt;&#x2F;p&gt;
+&lt;p&gt;I found two Rust crates that could help us send requests to a ClickHouse database: &lt;a href=&quot;https:&#x2F;&#x2F;crates.io&#x2F;crates&#x2F;clickhouse&quot;&gt;&lt;code&gt;clickhouse&lt;&#x2F;code&gt;&lt;&#x2F;a&gt; and &lt;a href=&quot;https:&#x2F;&#x2F;crates.io&#x2F;crates&#x2F;clickhouse-rs&quot;&gt;&lt;code&gt;clickhouse-rs&lt;&#x2F;code&gt;&lt;&#x2F;a&gt;. &lt;code&gt;clickhouse&lt;&#x2F;code&gt; is the first one I considered. I had to discard it because it was focused on concrete Rust types and needed to know &lt;em&gt;at compile time&lt;&#x2F;em&gt; what each datatype is composed of. The second crate was a bit more low-level and allowed us to do what we need.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;writing-a-super-simple-sink&quot;&gt;Writing a super simple sink&lt;a class=&quot;zola-anchor&quot; href=&quot;#writing-a-super-simple-sink&quot; aria-label=&quot;Anchor link for: writing-a-super-simple-sink&quot;&gt;&lt;i class=&quot;fas fa-link&quot;&gt;&lt;&#x2F;i&gt;&lt;&#x2F;a&gt; 
+&lt;&#x2F;h2&gt;
+&lt;p&gt;Once I got every ClickHouse detail right, I started playing with the Tremor side. There were multiple connectors already implemented in Tremor. I picked the simplest ones and started copying parts of it and quickly got something working.&lt;&#x2F;p&gt;
+&lt;p&gt;The only challenge I encountered is that Tremor defines its own &lt;code&gt;Value&lt;&#x2F;code&gt; type, representing a value whose type is not really known at compile time, and uses it &lt;em&gt;a lot&lt;&#x2F;em&gt;. It was a bit disconcerting doing such things in Rust, as I felt I was writing dynamically-typed code in a statically-typed language, but I managed to get through it.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;converting-tremor-values-to-clickhouse-values&quot;&gt;Converting Tremor values to ClickHouse values&lt;a class=&quot;zola-anchor&quot; href=&quot;#converting-tremor-values-to-clickhouse-values&quot; aria-label=&quot;Anchor link for: converting-tremor-values-to-clickhouse-values&quot;&gt;&lt;i class=&quot;fas fa-link&quot;&gt;&lt;&#x2F;i&gt;&lt;&#x2F;a&gt; 
+&lt;&#x2F;h2&gt;
+&lt;p&gt;Once I was able to insert data in a database from Tremor, I started writing a conversion bridge for ClickHouse types, i.e. something that would handle the conversion of native Tremor values to their corresponding ClickHouse types. &lt;&#x2F;p&gt;
+&lt;p&gt;Most of the conversions are quite simple: an integer can be obtained from an integer, a string can be obtained from any string, and so on.&lt;&#x2F;p&gt;
+&lt;p&gt;Some other conversions were less obvious. For instance, in order to create a ClickHouse IPv4 type, we could either use a string representing the address, or an array of four integers. The goal was to make every ClickHouse type constructible from a Tremor value. I tried to make every conversion as obvious as possible, and to document them as much as possible.&lt;&#x2F;p&gt;
+&lt;p&gt;The first implementation of this mapping function was huge. It was about 250 lines of tricky and slightly incorrect code. I managed to rewrite it from scratch using another approach and it got way better.&lt;&#x2F;p&gt;
+&lt;p&gt;Working on this specific part led me to open three pull request to the &lt;code&gt;clickhouse-rs&lt;&#x2F;code&gt; crate:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;suharev7&#x2F;clickhouse-rs&#x2F;pull&#x2F;171&quot;&gt;Make Value fully constructible (#171)&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;suharev7&#x2F;clickhouse-rs&#x2F;pull&#x2F;172&quot;&gt;Compare IP adresses properly (#172)&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;suharev7&#x2F;clickhouse-rs&#x2F;pull&#x2F;173&quot;&gt;Allow for Enum8 and DateTime64 value comparison (#173)&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;h2 id=&quot;testing&quot;&gt;Testing&lt;a class=&quot;zola-anchor&quot; href=&quot;#testing&quot; aria-label=&quot;Anchor link for: testing&quot;&gt;&lt;i class=&quot;fas fa-link&quot;&gt;&lt;&#x2F;i&gt;&lt;&#x2F;a&gt; 
+&lt;&#x2F;h2&gt;
+&lt;p&gt;The conversion function described in the previous subsection was fairly complex. Each possible conversion and cast has been carefully tested in order to ensure that it behaves correctly. These tests were greatly simplified thanks to the use of declarative macro.&lt;&#x2F;p&gt;
+&lt;p&gt;Some other tests were focused on testing the sink as a whole, and how it would interact with a ClickHouse database. In this kind of test, we would run ClickHouse Docker containers, create a ClickHouse sink, plug the sink to the container, send some events, and see what has been inserted in the ClickHouse side.&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;what-to-do-next&quot;&gt;What to do next?&lt;a class=&quot;zola-anchor&quot; href=&quot;#what-to-do-next&quot; aria-label=&quot;Anchor link for: what-to-do-next&quot;&gt;&lt;i class=&quot;fas fa-link&quot;&gt;&lt;&#x2F;i&gt;&lt;&#x2F;a&gt; 
+&lt;&#x2F;h1&gt;
+&lt;h2 id=&quot;improving-the-sink&quot;&gt;Improving the sink&lt;a class=&quot;zola-anchor&quot; href=&quot;#improving-the-sink&quot; aria-label=&quot;Anchor link for: improving-the-sink&quot;&gt;&lt;i class=&quot;fas fa-link&quot;&gt;&lt;&#x2F;i&gt;&lt;&#x2F;a&gt; 
+&lt;&#x2F;h2&gt;
+&lt;h3 id=&quot;automatically-getting-the-table-schema&quot;&gt;Automatically getting the table schema&lt;a class=&quot;zola-anchor&quot; href=&quot;#automatically-getting-the-table-schema&quot; aria-label=&quot;Anchor link for: automatically-getting-the-table-schema&quot;&gt;&lt;i class=&quot;fas fa-link&quot;&gt;&lt;&#x2F;i&gt;&lt;&#x2F;a&gt; 
+&lt;&#x2F;h3&gt;
+&lt;p&gt;It turns out that ClickHouse has a &lt;a href=&quot;https:&#x2F;&#x2F;clickhouse.com&#x2F;docs&#x2F;en&#x2F;sql-reference&#x2F;statements&#x2F;describe-table&quot;&gt;&lt;code&gt;DESCRIBE TABLE&lt;&#x2F;code&gt; statement&lt;&#x2F;a&gt;, which allows to gather information about each column of a specific table. We currently rely on the end-user to provide us valid information about the table columns. Using this statement would reduce the amount of information we require from them, hence making it simpler to use.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;inserting-data-concurrently&quot;&gt;Inserting data concurrently&lt;a class=&quot;zola-anchor&quot; href=&quot;#inserting-data-concurrently&quot; aria-label=&quot;Anchor link for: inserting-data-concurrently&quot;&gt;&lt;i class=&quot;fas fa-link&quot;&gt;&lt;&#x2F;i&gt;&lt;&#x2F;a&gt; 
+&lt;&#x2F;h3&gt;
+&lt;p&gt;The current implementation of the ClickHouse container uses a single database connection object, which is reused across insertions. A good way to improve this system is to use multiple concurrent connections, so that we could insert multiple batch of events at once.&lt;&#x2F;p&gt;
+&lt;p&gt;A similar pattern has already been implemented in Tremor as part of the &lt;a href=&quot;https:&#x2F;&#x2F;www.tremor.rs&#x2F;docs&#x2F;edge&#x2F;reference&#x2F;connectors&#x2F;elastic&quot;&gt;&lt;code&gt;elastic&lt;&#x2F;code&gt;&lt;&#x2F;a&gt; connector. As such, most of the required machinery is already there.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;the-source-part&quot;&gt;The source part&lt;a class=&quot;zola-anchor&quot; href=&quot;#the-source-part&quot; aria-label=&quot;Anchor link for: the-source-part&quot;&gt;&lt;i class=&quot;fas fa-link&quot;&gt;&lt;&#x2F;i&gt;&lt;&#x2F;a&gt; 
+&lt;&#x2F;h2&gt;
+&lt;p&gt;This mentorship was focused on building a sink for ClickHouse. The next step could be to add a source connector, so that coming from a ClickHouse database can be ingested directly into a Tremor application.&lt;&#x2F;p&gt;
+&lt;p&gt;ClickHouse has a feature allowing to watch for updates in a given table. This way, we can simulate a stream of data, and make it flow in the Tremor system. Each time some data is inserted in the table, we can retrieve it, convert it into Tremor value and make it flow into the graph of nodes described earlier.&lt;&#x2F;p&gt;
+&lt;p&gt;This is something that we totally want to see in Tremor in the future. We can&#x27;t wait for the &lt;a href=&quot;https:&#x2F;&#x2F;clickhouse.com&#x2F;docs&#x2F;en&#x2F;sql-reference&#x2F;statements&#x2F;watch&#x2F;&quot;&gt;&lt;code&gt;WATCH&lt;&#x2F;code&gt; statement&lt;&#x2F;a&gt; to be considered stable.&lt;&#x2F;p&gt;
+</content>
+	</entry>
+	<entry xml:lang="en">
+		<title>A better cargo-readme - Issue 0: Humble Beginning</title>
+		<published>2021-12-06T00:00:00+00:00</published>
+		<updated>2021-12-08T00:00:00+00:00</updated>
+		<link href="https://scrabsha.github.io/abcr-issue-0/"/>
+		<link rel="alternate" href="https://scrabsha.github.io/abcr-issue-0/" type="text/html"/>
+		<id>https://scrabsha.github.io/abcr-issue-0/</id>
+		<content type="html">&lt;h1 id=&quot;introduction&quot;&gt;Introduction&lt;a class=&quot;zola-anchor&quot; href=&quot;#introduction&quot; aria-label=&quot;Anchor link for: introduction&quot;&gt;&lt;i class=&quot;fas fa-link&quot;&gt;&lt;&#x2F;i&gt;&lt;&#x2F;a&gt; 
+&lt;&#x2F;h1&gt;
+&lt;p&gt;I&#x27;m bad at writing READMEs for my Rust crates. Most of the time, I use &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;livioribeiro&#x2F;cargo-readme&quot;&gt;&lt;code&gt;cargo-readme&lt;&#x2F;code&gt;&lt;&#x2F;a&gt;. This program reads my code, extracts its crate-level documentation, and generates a cute README file, which will be displayed on &lt;a href=&quot;https:&#x2F;&#x2F;crates.io&quot;&gt;crates.io&lt;&#x2F;a&gt;. Let&#x27;s consider the following small Rust crate:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;rust&quot; style=&quot;background-color:#2e3440;color:#d8dee9;&quot; class=&quot;language-rust &quot;&gt;&lt;code class=&quot;language-rust&quot; data-lang=&quot;rust&quot;&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F;! # My crate
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F;!
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F;! Here&amp;#39;s some crate-level documentation.
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F;&#x2F; A public data structure
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;pub struct &lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fbcbb;&quot;&gt;S&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;When invoked on this crate, cargo-readme should generate the following markdown code:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;markdown&quot; style=&quot;background-color:#2e3440;color:#d8dee9;&quot; class=&quot;language-markdown &quot;&gt;&lt;code class=&quot;language-markdown&quot; data-lang=&quot;markdown&quot;&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;# abcr_step0
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;## My crate
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;Here&amp;#39;s some crate-level documentation
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;The goal of cargo-readme is to make the README file rendered on &lt;a href=&quot;https:&#x2F;&#x2F;crates.io&quot;&gt;crates.io&lt;&#x2F;a&gt; very close to what the user would read if they open the crate documentation on &lt;a href=&quot;https:&#x2F;&#x2F;docs.rs&quot;&gt;docs.rs&lt;&#x2F;a&gt;. It is used in real-world Rust crates such as &lt;code&gt;bumpalo&lt;&#x2F;code&gt; (compare its &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;fitzgen&#x2F;bumpalo&#x2F;blob&#x2F;master&#x2F;README.md#bumpalo&quot;&gt;README&lt;&#x2F;a&gt; and its &lt;a href=&quot;https:&#x2F;&#x2F;docs.rs&#x2F;bumpalo&#x2F;latest&quot;&gt;actual documentation&lt;&#x2F;a&gt;). So far so good.&lt;&#x2F;p&gt;
+&lt;p&gt;I recently open-sourced &lt;a href=&quot;https:&#x2F;&#x2F;docs.rs&#x2F;dep_doc&#x2F;latest&#x2F;dep_doc&#x2F;&quot;&gt;&lt;code&gt;dep_doc&lt;&#x2F;code&gt;&lt;&#x2F;a&gt;, which uses macros to generate a cute dependency declaration snippet. To explain it briefly, the user can add a &lt;code&gt;#![doc = dep_doc::dep_doc!()]&lt;&#x2F;code&gt; somewhere in their crate-level documentation, and the following code snippet will be automatically generated in the crate documentation:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;TOML&quot; style=&quot;background-color:#2e3440;color:#d8dee9;&quot; class=&quot;language-TOML &quot;&gt;&lt;code class=&quot;language-TOML&quot; data-lang=&quot;TOML&quot;&gt;&lt;span&gt;[dependencies]
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;CRATE_NAME &lt;&#x2F;span&gt;&lt;span&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#a3be8c;&quot;&gt;&amp;quot;CRATE_VERSION&amp;quot;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;What&#x27;s interesting here is that &lt;code&gt;CRATE_NAME&lt;&#x2F;code&gt; and &lt;code&gt;CRATE_VERSION&lt;&#x2F;code&gt; are guaranteed to always refer to the current crate name and version, which prevents the users from forgetting to update the snippet before releasing.&lt;&#x2F;p&gt;
+&lt;p&gt;Let&#x27;s add a call to &lt;a href=&quot;https:&#x2F;&#x2F;docs.rs&#x2F;dep_doc&#x2F;latest&#x2F;dep_doc&#x2F;&quot;&gt;&lt;code&gt;dep_doc&lt;&#x2F;code&gt;&lt;&#x2F;a&gt; to our crate to see if it handles our macro:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;rust&quot; style=&quot;background-color:#2e3440;color:#d8dee9;&quot; class=&quot;language-rust &quot;&gt;&lt;code class=&quot;language-rust&quot; data-lang=&quot;rust&quot;&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F;! # My crate
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F;!
+&lt;&#x2F;span&gt;&lt;span&gt;#![doc &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span&gt;dep_doc::dep_doc!()]
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F;!
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F;! Here&amp;#39;s some crate-level documentation
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F;&#x2F; A public data structure
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;pub struct &lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fbcbb;&quot;&gt;S&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;This gives us the following:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;markdown&quot; style=&quot;background-color:#2e3440;color:#d8dee9;&quot; class=&quot;language-markdown &quot;&gt;&lt;code class=&quot;language-markdown&quot; data-lang=&quot;markdown&quot;&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;# abcr_step0
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;## My crate
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;That&#x27;s a bit embarassing. It should generate something like:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;markdown&quot; style=&quot;background-color:#2e3440;color:#d8dee9;&quot; class=&quot;language-markdown &quot;&gt;&lt;code class=&quot;language-markdown&quot; data-lang=&quot;markdown&quot;&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;# abcr_step0
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fbcbb;&quot;&gt;```&lt;&#x2F;span&gt;&lt;span&gt;TOML
+&lt;&#x2F;span&gt;&lt;span&gt;[dependencies]
+&lt;&#x2F;span&gt;&lt;span&gt;abcr-step0 = &amp;quot;0.1.0&amp;quot;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fbcbb;&quot;&gt;```
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;## My crate
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;Here&amp;#39;s some crate-level documentation
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;This means that &lt;a href=&quot;https:&#x2F;&#x2F;docs.rs&#x2F;dep_doc&#x2F;latest&#x2F;dep_doc&#x2F;&quot;&gt;&lt;code&gt;dep_doc&lt;&#x2F;code&gt;&lt;&#x2F;a&gt; will break the README file of every Rustacean who use it. In order to understand why, we need to dive in &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;livioribeiro&#x2F;cargo-readme&quot;&gt;&lt;code&gt;cargo-readme&lt;&#x2F;code&gt;&lt;&#x2F;a&gt;&#x27;s source code. The whole algorithm is available in &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;livioribeiro&#x2F;cargo-readme&#x2F;blob&#x2F;master&#x2F;src&#x2F;readme&#x2F;extract.rs&quot;&gt;&lt;code&gt;src&#x2F;readme&#x2F;extract.rs&lt;&#x2F;code&gt;&lt;&#x2F;a&gt;. To explain it briefly, it iterates over each line of the crate&#x27;s &lt;code&gt;src&#x2F;lib.rs&lt;&#x2F;code&gt; and saves every line which starts with &lt;code&gt;&#x2F;&#x2F;!&lt;&#x2F;code&gt;, until it meets a line which starts with something else. This is fine for simple use case, but it will mess up each time it encounters something more complex, including macros.&lt;&#x2F;p&gt;
+&lt;p&gt;Once the crate-level documentation is extracted, very little processing is performed. Specifically, &lt;code&gt;#&lt;&#x2F;code&gt; headers are transformed in &lt;code&gt;##&lt;&#x2F;code&gt; headers and so on. As far as I know, no additional processing is performed. This means that intra-doc links are broken in the README file. Let&#x27;s add one to our example snippet:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;rust&quot; style=&quot;background-color:#2e3440;color:#d8dee9;&quot; class=&quot;language-rust &quot;&gt;&lt;code class=&quot;language-rust&quot; data-lang=&quot;rust&quot;&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F;! # My crate
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F;!
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F;! The [`Cow`] says moo 🐮
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F;!
+&lt;&#x2F;span&gt;&lt;span&gt;#![doc &lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span&gt;dep_doc::dep_doc!()]
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F;!
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F;! Here&amp;#39;s some crate-level documentation
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;use &lt;&#x2F;span&gt;&lt;span&gt;std&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;::&lt;&#x2F;span&gt;&lt;span&gt;borrow&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;::&lt;&#x2F;span&gt;&lt;span&gt;Cow&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#616e88;&quot;&gt;&#x2F;&#x2F;&#x2F; A public data structure
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#81a1c1;&quot;&gt;pub struct &lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fbcbb;&quot;&gt;S&lt;&#x2F;span&gt;&lt;span style=&quot;color:#eceff4;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;This is rendered as:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;markdown&quot; style=&quot;background-color:#2e3440;color:#d8dee9;&quot; class=&quot;language-markdown &quot;&gt;&lt;code class=&quot;language-markdown&quot; data-lang=&quot;markdown&quot;&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;# abcr_step0
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#88c0d0;&quot;&gt;## My crate
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;The [&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8fbcbb;&quot;&gt;`Cow`&lt;&#x2F;span&gt;&lt;span&gt;] says moo 🐮
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;See? The intra-doc link has been copied &lt;em&gt;as is&lt;&#x2F;em&gt; with no change whatsoever.&lt;&#x2F;p&gt;
+&lt;p&gt;The problem here comes from the fact that &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;livioribeiro&#x2F;cargo-readme&quot;&gt;&lt;code&gt;cargo-readme&lt;&#x2F;code&gt;&lt;&#x2F;a&gt; takes a naive approach. Most notably, a Rust program is not a sequence of lines that we can analyze one after another in a single pass. Instead, it is a complete syntax tree where every node obeys to some special rules. It would make more sense to parse the input code instead of blindly generate the README file one line after another.&lt;&#x2F;p&gt;
+&lt;p&gt;Parsing the input code is the approach that &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;msrd0&#x2F;cargo-doc2readme&quot;&gt;&lt;code&gt;cargo-doc2readme&lt;&#x2F;code&gt;&lt;&#x2F;a&gt; takes. To explain briefly, it uses &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;dtolnay&#x2F;syn&quot;&gt;&lt;code&gt;syn&lt;&#x2F;code&gt;&lt;&#x2F;a&gt; to create a syntax tree, extracts the imports and the crate documentation, resolves the intra-doc links thanks to the imports, and generates the output README file.&lt;&#x2F;p&gt;
+&lt;p&gt;This approach is a very good idea, but the problem is that we&#x27;re processing raw syntax tree, which means that we can&#x27;t have macro expansion. There&#x27;s a little trick in which you parse the output of &lt;code&gt;cargo expand&lt;&#x2F;code&gt; instead of the &lt;code&gt;src&#x2F;lib.rs&lt;&#x2F;code&gt; file. Actually, we&#x27;re not calling &lt;code&gt;cargo expand&lt;&#x2F;code&gt;, but invoking Rustc with the correct command-line arguments. The idea is the same. This definitely works, but in my opinion, this is more a hack than an actual solution.&lt;&#x2F;p&gt;
+&lt;p&gt;In this blogpost series, we will build our own &lt;code&gt;cargo-readme&lt;&#x2F;code&gt; tool. Instead of reading the input line by line, or traversing the crate&#x27;s AST, we will use already-existing Rust tools to gather everything for us and retrieve data that has already been processed. We will try to implement as little algorithms as possible and rely as much as possible on Rust tools.&lt;&#x2F;p&gt;
+&lt;p&gt;In this zeroth issue, we will focus on describing a new approach and show that it is good enough to solve our problem. We won&#x27;t write Rust code at all. Instead, we will use high-level tools and bash commands.&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;the-basic-idea&quot;&gt;The basic idea&lt;a class=&quot;zola-anchor&quot; href=&quot;#the-basic-idea&quot; aria-label=&quot;Anchor link for: the-basic-idea&quot;&gt;&lt;i class=&quot;fas fa-link&quot;&gt;&lt;&#x2F;i&gt;&lt;&#x2F;a&gt; 
+&lt;&#x2F;h1&gt;
+&lt;p&gt;There&#x27;s a well-known Rust tool that is responsible (among others) for expanding macros, extracting documentation and resolving intra-doc links. It is &lt;code&gt;rustdoc&lt;&#x2F;code&gt; itself. &lt;code&gt;rustdoc&lt;&#x2F;code&gt; is the command-line tool that is invoked by &lt;code&gt;cargo&lt;&#x2F;code&gt; each time a &lt;code&gt;cargo doc&lt;&#x2F;code&gt; is performed. It takes whole crate code, extracts the documentation for the public API and generates a bunch of wonderful HTML files that can be viewed in a browser. As far as i know, this tool is the only documentation generation tool in the Rust ecosystem. It would be very good if it could output something else than an HTML page. Let&#x27;s look at its help page:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2e3440;color:#d8dee9;&quot;&gt;&lt;code&gt;&lt;span&gt;$ rustdoc --help
+&lt;&#x2F;span&gt;&lt;span&gt;rustdoc [options] &amp;lt;input&amp;gt;
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;Options:
+&lt;&#x2F;span&gt;&lt;span&gt;    -h, --help          show this help message
+&lt;&#x2F;span&gt;&lt;span&gt;    -V, --version       print rustdoc&amp;#39;s version
+&lt;&#x2F;span&gt;&lt;span&gt;    -v, --verbose       use verbose output
+&lt;&#x2F;span&gt;&lt;span&gt;    -r, --input-format [rust]
+&lt;&#x2F;span&gt;&lt;span&gt;                        the input type of the specified file
+&lt;&#x2F;span&gt;&lt;span&gt;    -w, --output-format [html]
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;&amp;lt;output skipped for brevity&amp;gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;The &lt;code&gt;-w&lt;&#x2F;code&gt; option looks promising. By looking at &lt;a href=&quot;https:&#x2F;&#x2F;doc.rust-lang.org&#x2F;rustdoc&#x2F;unstable-features.html#-w--output-format-output-format&quot;&gt;its documentation&lt;&#x2F;a&gt;, we can learn that it is an &lt;em&gt;unstable feature&lt;&#x2F;em&gt; which accepts &lt;code&gt;json&lt;&#x2F;code&gt; and &lt;code&gt;html&lt;&#x2F;code&gt; as parameter. We could use the &lt;code&gt;json&lt;&#x2F;code&gt; output to extract the information we need. As this is an unstable feature, will use nightly toolchain (unless we use &lt;a href=&quot;https:&#x2F;&#x2F;rustc-dev-guide.rust-lang.org&#x2F;building&#x2F;bootstrapping.html#complications-of-bootstrapping&quot;&gt;the forbidden environment variable&lt;&#x2F;a&gt;, but that&#x27;s not a good idea).&lt;&#x2F;p&gt;
+&lt;p&gt;Let&#x27;s run &lt;code&gt;rustdoc&lt;&#x2F;code&gt; with the &lt;code&gt;json&lt;&#x2F;code&gt; output format:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2e3440;color:#d8dee9;&quot;&gt;&lt;code&gt;&lt;span&gt;$ cargo +nightly rustdoc -- -Zunstable-options -wjson
+&lt;&#x2F;span&gt;&lt;span&gt;Checking dep_doc v0.1.1
+&lt;&#x2F;span&gt;&lt;span&gt; Documenting abcr-step0 v0.1.0 (&#x2F;tmp&#x2F;abcr-step0)
+&lt;&#x2F;span&gt;&lt;span&gt;    Finished dev [unoptimized + debuginfo] target(s) in 4.44s
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;I expected the output to be printed to stdout, but nothing appeared. Let&#x27;s look at the &lt;code&gt;target&lt;&#x2F;code&gt; directory:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2e3440;color:#d8dee9;&quot;&gt;&lt;code&gt;&lt;span&gt;$ tree target&#x2F;
+&lt;&#x2F;span&gt;&lt;span&gt;target&#x2F;
+&lt;&#x2F;span&gt;&lt;span&gt;├── CACHEDIR.TAG
+&lt;&#x2F;span&gt;&lt;span&gt;├── debug
+&lt;&#x2F;span&gt;&lt;span&gt;│   ├── build
+&lt;&#x2F;span&gt;&lt;span&gt;│   ├── deps
+&lt;&#x2F;span&gt;&lt;span&gt;│   │   ├── dep_doc-31d529d57f7de8bf.d
+&lt;&#x2F;span&gt;&lt;span&gt;│   │   └── libdep_doc-31d529d57f7de8bf.rmeta
+&lt;&#x2F;span&gt;&lt;span&gt;│   ├── examples
+&lt;&#x2F;span&gt;&lt;span&gt;│   └── incremental
+&lt;&#x2F;span&gt;&lt;span&gt;└── doc
+&lt;&#x2F;span&gt;&lt;span&gt;    └── abcr_step0.json
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;6 directories, 4 files
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;It looks like we&#x27;re looking for the &lt;code&gt;target&#x2F;doc&#x2F;abcr_step0.json&lt;&#x2F;code&gt; file. Let&#x27;s get a very rough estimate of the amount of data in it:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2e3440;color:#d8dee9;&quot;&gt;&lt;code&gt;&lt;span&gt;$ cat target&#x2F;doc&#x2F;abcr_step0.json | jq | wc -l
+&lt;&#x2F;span&gt;&lt;span&gt;32034
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Don&#x27;t know what jq is? We&#x27;ll discuss it shortly in the next section. For now, what matter is that the &lt;code&gt;cargo rustdoc&lt;&#x2F;code&gt; command we issued previously extracted a huge amount of data from the crate. We will use it to generate the appropriate README.&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;using-jq-to-prove-that-it-s-possible&quot;&gt;Using jq to prove that it&#x27;s possible&lt;a class=&quot;zola-anchor&quot; href=&quot;#using-jq-to-prove-that-it-s-possible&quot; aria-label=&quot;Anchor link for: using-jq-to-prove-that-it-s-possible&quot;&gt;&lt;i class=&quot;fas fa-link&quot;&gt;&lt;&#x2F;i&gt;&lt;&#x2F;a&gt; 
+&lt;&#x2F;h1&gt;
+&lt;p&gt;&lt;a href=&quot;https:&#x2F;&#x2F;stedolan.github.io&#x2F;jq&#x2F;&quot;&gt;&lt;code&gt;jq&lt;&#x2F;code&gt;&lt;&#x2F;a&gt; is a command-line tool which allows to extract data from JSON documents. We&#x27;ll use it in order to extract specific pieces of the &lt;code&gt;rustdoc&lt;&#x2F;code&gt; output, and hopefully prove that we have everything needed for the README generation.&lt;&#x2F;p&gt;
+&lt;p&gt;The JSON document follows a specific structure defined in the &lt;code&gt;rustdoc_json_types&lt;&#x2F;code&gt;&#x27;s &lt;a href=&quot;https:&#x2F;&#x2F;doc.rust-lang.org&#x2F;nightly&#x2F;nightly-rustc&#x2F;rustdoc_json_types&#x2F;struct.Crate.html&quot;&gt;&lt;code&gt;Crate&lt;&#x2F;code&gt;&lt;&#x2F;a&gt; datatype. Knowing where and how each data is stored will allow us to write the correct &lt;code&gt;jq&lt;&#x2F;code&gt; commands.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;extracting-the-crate-level-documentation&quot;&gt;Extracting the crate-level documentation&lt;a class=&quot;zola-anchor&quot; href=&quot;#extracting-the-crate-level-documentation&quot; aria-label=&quot;Anchor link for: extracting-the-crate-level-documentation&quot;&gt;&lt;i class=&quot;fas fa-link&quot;&gt;&lt;&#x2F;i&gt;&lt;&#x2F;a&gt; 
+&lt;&#x2F;h2&gt;
+&lt;p&gt;After a few minutes of diving in the data structures, we can see that all the items that are reachable from the crate are located in the &lt;a href=&quot;https:&#x2F;&#x2F;doc.rust-lang.org&#x2F;nightly&#x2F;nightly-rustc&#x2F;rustdoc_json_types&#x2F;struct.Crate.html#structfield.index&quot;&gt;&lt;code&gt;index&lt;&#x2F;code&gt;&lt;&#x2F;a&gt; field. This field is a JSON dictionary whose keys are compiler-generated &lt;a href=&quot;https:&#x2F;&#x2F;doc.rust-lang.org&#x2F;nightly&#x2F;nightly-rustc&#x2F;rustdoc_json_types&#x2F;struct.Id.html&quot;&gt;&lt;code&gt;Id&lt;&#x2F;code&gt;&lt;&#x2F;a&gt;s and values are metadata of the reachable items. Additionally, there is a &lt;a href=&quot;https:&#x2F;&#x2F;doc.rust-lang.org&#x2F;nightly&#x2F;nightly-rustc&#x2F;rustdoc_json_types&#x2F;struct.Crate.html#structfield.root&quot;&gt;&lt;code&gt;root&lt;&#x2F;code&gt;&lt;&#x2F;a&gt; field, which tells us which key in the index map will give us the documentation for the crate&#x27;s root module.&lt;&#x2F;p&gt;
+&lt;p&gt;Let&#x27;s try to write a command which extracts the crate-level documentation using &lt;code&gt;jq&lt;&#x2F;code&gt;:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2e3440;color:#d8dee9;&quot;&gt;&lt;code&gt;&lt;span&gt;$ cat target&#x2F;doc&#x2F;abcr_step0.json | jq &amp;#39;{docs: .index[.root].docs}&amp;#39;
+&lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;  &amp;quot;docs&amp;quot;: &amp;quot;# My crate\n\nThe [`Cow`] says moo 🐮\n\n```TOML\n[dependencies]\nabcr_step0 = \&amp;quot;0.1.0\&amp;quot;\n```\n\nHere&amp;#39;s some crate-level documentation&amp;quot;
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;We did it! We managed to extract the crate documentation from the rustdoc-generated file. Additionally, the macros are expanded, which instantly solves one of our initial requirements.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;extracting-intra-doc-link-resolution&quot;&gt;Extracting intra-doc link resolution&lt;a class=&quot;zola-anchor&quot; href=&quot;#extracting-intra-doc-link-resolution&quot; aria-label=&quot;Anchor link for: extracting-intra-doc-link-resolution&quot;&gt;&lt;i class=&quot;fas fa-link&quot;&gt;&lt;&#x2F;i&gt;&lt;&#x2F;a&gt; 
+&lt;&#x2F;h2&gt;
+&lt;p&gt;By looking at the documentation for &lt;a href=&quot;https:&#x2F;&#x2F;doc.rust-lang.org&#x2F;nightly&#x2F;nightly-rustc&#x2F;rustdoc_json_types&#x2F;struct.Item.html&quot;&gt;&lt;code&gt;Item&lt;&#x2F;code&gt;&lt;&#x2F;a&gt;, we can update our command to extract the &lt;a href=&quot;https:&#x2F;&#x2F;doc.rust-lang.org&#x2F;nightly&#x2F;nightly-rustc&#x2F;rustdoc_json_types&#x2F;struct.Item.html#structfield.links&quot;&gt;&lt;code&gt;links&lt;&#x2F;code&gt;&lt;&#x2F;a&gt; as well:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2e3440;color:#d8dee9;&quot;&gt;&lt;code&gt;&lt;span&gt;$ cat target&#x2F;doc&#x2F;abcr_step0.json | jq &amp;#39;{ docs: .index[.root].docs, links: .index[.root].links }&amp;#39;
+&lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;  &amp;quot;docs&amp;quot;: &amp;quot;# My crate\n\n```TOML\n[dependencies]\nabcr_step0 = \&amp;quot;0.1.0\&amp;quot;\n```\n\nHere&amp;#39;s some crate-level documentation\n\nHere&amp;#39;s a link to [`Cow`].&amp;quot;,
+&lt;&#x2F;span&gt;&lt;span&gt;  &amp;quot;links&amp;quot;: {
+&lt;&#x2F;span&gt;&lt;span&gt;    &amp;quot;`Cow`&amp;quot;: &amp;quot;5:546&amp;quot;
+&lt;&#x2F;span&gt;&lt;span&gt;  }
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;This returns the &lt;a href=&quot;https:&#x2F;&#x2F;doc.rust-lang.org&#x2F;nightly&#x2F;nightly-rustc&#x2F;rustdoc_json_types&#x2F;struct.Id.html&quot;&gt;&lt;code&gt;Id&lt;&#x2F;code&gt;&lt;&#x2F;a&gt; of the &lt;a href=&quot;https:&#x2F;&#x2F;doc.rust-lang.org&#x2F;nightly&#x2F;nightly-rustc&#x2F;rustdoc_json_types&#x2F;struct.Item.html&quot;&gt;&lt;code&gt;Item&lt;&#x2F;code&gt;&lt;&#x2F;a&gt; that is linked. Let&#x27;s see if we can retrieve its path:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2e3440;color:#d8dee9;&quot;&gt;&lt;code&gt;&lt;span&gt;$ cat target&#x2F;doc&#x2F;abcr_step0.json | jq &amp;#39;{ links_to_cow: .paths.&amp;quot;5:546&amp;quot;.path }&amp;#39;
+&lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;  &amp;quot;links_to_cow&amp;quot;: [
+&lt;&#x2F;span&gt;&lt;span&gt;    &amp;quot;alloc&amp;quot;,
+&lt;&#x2F;span&gt;&lt;span&gt;    &amp;quot;borrow&amp;quot;,
+&lt;&#x2F;span&gt;&lt;span&gt;    &amp;quot;Cow&amp;quot;
+&lt;&#x2F;span&gt;&lt;span&gt;  ]
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;This proves that we can retrieve the path to the item that is linked. Awesome.&lt;&#x2F;p&gt;
+&lt;p&gt;We could spend time writing a more complex &lt;code&gt;jq&lt;&#x2F;code&gt; command which fetches the intra-doc links and resolves all of them in one pass, but the goal here is to prove that it is possible, rather than building a complete tool using half-backed shell commands.&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;conclusion&quot;&gt;Conclusion&lt;a class=&quot;zola-anchor&quot; href=&quot;#conclusion&quot; aria-label=&quot;Anchor link for: conclusion&quot;&gt;&lt;i class=&quot;fas fa-link&quot;&gt;&lt;&#x2F;i&gt;&lt;&#x2F;a&gt; 
+&lt;&#x2F;h1&gt;
+&lt;p&gt;In this blogpost we listed the different README generators in the Rust ecosystem. We explained their different approaches and detailed their pros and cons. Finally, we suggested that we could use an already-existing Rust tool, &lt;code&gt;rustdoc&lt;&#x2F;code&gt;, to gather data for us, and analyze it ourselves.&lt;&#x2F;p&gt;
+&lt;p&gt;Next issue will focus on writing an actual Rust program which extracts crate-level documentation, and prints it in the terminal.&lt;&#x2F;p&gt;
+&lt;p&gt;This issue was reviewed by volunteers who gave me a lot of feedback. They are, in alphabetical order:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https:&#x2F;&#x2F;twitter.com&#x2F;miguelraz_&quot;&gt;Julia REPL stan account&lt;&#x2F;a&gt;,&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;a href=&quot;https:&#x2F;&#x2F;twitter.com&#x2F;heymingwei&quot;&gt;Mingwei Zhang 🦀&lt;&#x2F;a&gt;,&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;a href=&quot;https:&#x2F;&#x2F;twitter.com&#x2F;natsukoow&quot;&gt;Natsukoh&lt;&#x2F;a&gt;,&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;a href=&quot;https:&#x2F;&#x2F;twitter.com&#x2F;yozhgoor&quot;&gt;Yozhgoor 🦀&lt;&#x2F;a&gt;.&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;Initial release of the blogpost used a hardcoded &lt;code&gt;id&lt;&#x2F;code&gt; to retrieve the crate-level documentation. &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;aDotInTheVoid&quot;&gt;@aDotInTheVoid&lt;&#x2F;a&gt; suggested to use the &lt;code&gt;root&lt;&#x2F;code&gt; field instead. Thanks!&lt;&#x2F;p&gt;
+&lt;p&gt;If you&#x27;re interested in reviewing the next articles or implementation, don&#x27;t hesitate to message me on Twitter. I gladly welcome any kind of constructive feedback.&lt;&#x2F;p&gt;
+</content>
+	</entry>
+	<entry xml:lang="en">
+		<title>About Me</title>
+		<published>2020-12-10T00:00:00+00:00</published>
+		<updated>2021-11-29T00:00:00+00:00</updated>
+		<link href="https://scrabsha.github.io/about-me/"/>
+		<link rel="alternate" href="https://scrabsha.github.io/about-me/" type="text/html"/>
+		<id>https://scrabsha.github.io/about-me/</id>
+		<content type="html">&lt;p&gt;Hi there! I am Sasha Pourcelot (she&#x2F;her pronouns). I&#x27;m a CS student at Polytech
+Nice Sophia, France.&lt;&#x2F;p&gt;
+&lt;p&gt;I enjoy programming in Rust and cooking pizzas.&lt;&#x2F;p&gt;
+&lt;p&gt;My GitHub handle is &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;scrabsha&quot;&gt;@scrabsha&lt;&#x2F;a&gt;. You can also find me on twitter
+at &lt;a href=&quot;https:&#x2F;&#x2F;twitter.com&#x2F;scrabsha&quot;&gt;@scrabsha&lt;&#x2F;a&gt; too. Finally, you can send me a mail at
+&lt;a href=&quot;mailto:sasha.pourcelot@protonmail.com&quot;&gt;sasha.pourcelot@protonmail.com&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;I enjoy writing static analysis tools or macros.&lt;&#x2F;p&gt;
+&lt;p&gt;I have done some very small contributions to the Rust compiler and written Rust
+tools such as &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;iomentum&#x2F;cargo-breaking&quot;&gt;cargo-breaking&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;I am the primary author of the following Rust crates:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;iomentum&#x2F;cargo-breaking&quot;&gt;cargo-breaking&lt;&#x2F;a&gt;,&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;scrabsha&#x2F;dep-doc&quot;&gt;dep-doc&lt;&#x2F;a&gt;,&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;scrabsha&#x2F;cargo-abcr&quot;&gt;cargo-abcr&lt;&#x2F;a&gt; (as part of the &lt;em&gt;A better &lt;code&gt;cargo-readme&lt;&#x2F;code&gt;&lt;&#x2F;em&gt; series),&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;If you&#x27;re interested in my work and want to discuss with me about it, or about
+anything else, feel free to send me a direct message on Twitter.&lt;&#x2F;p&gt;
+</content>
+	</entry>
+</feed>

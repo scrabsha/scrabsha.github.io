@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    
+
+        <meta charset="utf-8" />
+        <meta name="referrer" content="no-referrer">
+
+        <!-- Enable responsiveness on mobile devices-->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+
+        <title>The invisible macro transcriber constraint | S🦀sha&#x27;s blog</title>
+<meta property="og:title" content="The invisible macro transcriber constraint | S🦀sha&#x27;s blog" />
+<meta name="twitter:title" content="The invisible macro transcriber constraint | S🦀sha&#x27;s blog" />
+
+        
+
+        <meta property="og:site_name" content="S🦀sha&#x27;s blog" />
+        <meta property="og:url" content="https:&#x2F;&#x2F;scrabsha.github.io" />
+
+        
+
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://scrabsha.github.io/base.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap" rel="stylesheet">
+        <link href="https://scrabsha.github.io/fontawesome/fontawesome.css" rel="stylesheet">
+        <link href="https://scrabsha.github.io/fontawesome/brands.css" rel="stylesheet">
+        <link href="https://scrabsha.github.io/fontawesome/solid.css" rel="stylesheet">
+
+        <link rel='icon' type='image/x-icon' href="https://scrabsha.github.io/favicon.ico" />
+
+        <link rel="alternate" type="application/atom+xml" title="S🦀sha&#x27;s blog" href="https://scrabsha.github.io/atom.xml">
+
+        
+
+    
+<meta name="google-site-verification" content="UtDJuq6YPYKUwTOMg9w-N0_zJOzt92Ooc1UbcWh1P_M" />
+
+    </head>
+
+    <body>
+        <a href="#main" class="skip-link p-screen-reader-text">Skip to content</a>
+        <header class="l-header">
+            <h1 class="c-title p-title"><a href="https:&#x2F;&#x2F;scrabsha.github.io" class="p-title__link">S🦀sha&#x27;s blog</a></h1>
+            <p class="p-subtitle">
+                Some thoughts about my computer science journey
+            </p>
+            </header>
+
+        <main id="main" class="l-main">
+            
+<article class="p-article">
+    <header>
+        <h1>The invisible macro transcriber constraint
+</h1>
+        <div>
+            <div class="c-time">
+
+                <time datetime="2023-09-25">
+                    2023-09-25
+                </time>
+                
+                 - (3 min read)
+            </div>
+        </div>
+    </header>
+    
+    <section id="js-article" class="p-article__body">
+        <p><em>Disclaimer</em>: this post is rather small. I don't have time to expand further.</p>
+<h1 id="introduction">Introduction<a class="zola-anchor" href="#introduction" aria-label="Anchor link for: introduction"><i class="fas fa-link"></i></a> 
+</h1>
+<p>I always described macro rules as a bunch of &quot;tokens to tokens&quot; functions.
+For instance, <code>rustdoc</code> generates the following documentation for <code>anyhow!</code>
+macro:</p>
+<pre data-lang="rust" style="background-color:#2e3440;color:#d8dee9;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#616e88;">// https://docs.rs/anyhow/1.0.75/anyhow/macro.anyhow.html
+</span><span style="color:#88c0d0;">macro_rules! </span><span>anyhow {
+</span><span>    ($msg:literal </span><span style="color:#81a1c1;">$</span><span>(,)?) </span><span style="color:#81a1c1;">=&gt; </span><span>{ </span><span style="color:#81a1c1;">... </span><span>}</span><span style="color:#eceff4;">;
+</span><span>    ($err</span><span style="color:#eceff4;">:</span><span style="color:#81a1c1;">expr $</span><span>(,)?) </span><span style="color:#81a1c1;">=&gt; </span><span>{ </span><span style="color:#81a1c1;">... </span><span>}</span><span style="color:#eceff4;">;
+</span><span>    ($fmt</span><span style="color:#eceff4;">:</span><span style="color:#81a1c1;">expr</span><span>, </span><span style="color:#81a1c1;">$</span><span>($arg</span><span style="color:#eceff4;">:</span><span style="color:#81a1c1;">tt</span><span>)</span><span style="color:#81a1c1;">*</span><span>) </span><span style="color:#81a1c1;">=&gt; </span><span>{ </span><span style="color:#81a1c1;">... </span><span>}</span><span style="color:#eceff4;">;
+</span><span>}
+</span></code></pre>
+<p>I read the first rule as a function that generates <em>a piece of AST</em> from a
+literal. Likewise, I represented the second rule as a function that generates
+<em>a piece of AST</em> from an expression, and so on.</p>
+<h1 id="the-problem">The problem<a class="zola-anchor" href="#the-problem" aria-label="Anchor link for: the-problem"><i class="fas fa-link"></i></a> 
+</h1>
+<p>Let's take a smaller example that better suits this blogpost:</p>
+<pre data-lang="rust" style="background-color:#2e3440;color:#d8dee9;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#88c0d0;">macro_rules! </span><span>foo {
+</span><span>    (</span><span style="color:#81a1c1;">$</span><span>($id</span><span style="color:#eceff4;">:</span><span style="color:#81a1c1;">ident</span><span>)</span><span style="color:#81a1c1;">*</span><span>) </span><span style="color:#81a1c1;">=&gt; </span><span>{ </span><span style="color:#81a1c1;">... </span><span>}</span><span style="color:#eceff4;">;
+</span><span>}
+</span></code></pre>
+<p>I read this rule as a function that generates <em>a piece of AST</em> from zero or more
+identifiers. In other words, the only repetition constraints are stated in the
+macro matcher itself.</p>
+<p>Well, well, well. WELL.</p>
+<p>I was wrong.</p>
+<p>It turns out that it is possible to add some repetition constraints in the macro
+transcriber itself. For instance, we can provide a transcriber that requires at
+least one identifier to be passed to our <code>foo</code> macro:</p>
+<pre data-lang="rust" style="background-color:#2e3440;color:#d8dee9;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#88c0d0;">macro_rules! </span><span>foo {
+</span><span>    (</span><span style="color:#81a1c1;">$</span><span>($id</span><span style="color:#eceff4;">:</span><span style="color:#81a1c1;">ident</span><span>)</span><span style="color:#81a1c1;">*</span><span>) </span><span style="color:#81a1c1;">=&gt; </span><span>{{
+</span><span>        </span><span style="color:#81a1c1;">$</span><span>( foo!(</span><span style="color:#81a1c1;">@</span><span>discard $id)</span><span style="color:#eceff4;">; </span><span>)</span><span style="color:#81a1c1;">+ </span><span style="color:#616e88;">// &lt;-- ⚠️
+</span><span>    }}</span><span style="color:#eceff4;">;
+</span><span>    
+</span><span>    </span><span style="color:#616e88;">// Don&#39;t look at this - it&#39;s just a clean way to discard tokens.
+</span><span>    (@discard $tt</span><span style="color:#eceff4;">:</span><span style="color:#81a1c1;">tt</span><span>) </span><span style="color:#81a1c1;">=&gt; </span><span>{}
+</span><span>}
+</span></code></pre>
+<p>By using a <code>+</code> as a repetition operator in the transcription, we added a new
+constraint (there must be at least one identifier) that is not represented in
+the macro matcher (and not shown in <code>rustdoc</code>).</p>
+<p>Let's test it with different amounts of identifiers:</p>
+<pre data-lang="rust" style="background-color:#2e3440;color:#d8dee9;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#81a1c1;">fn </span><span style="color:#88c0d0;">main</span><span>() {
+</span><span>    foo!()</span><span style="color:#eceff4;">;
+</span><span>    foo!(a)</span><span style="color:#eceff4;">;
+</span><span>    foo!(a b)</span><span style="color:#eceff4;">;
+</span><span>    foo!(a b c)</span><span style="color:#eceff4;">;
+</span><span>}
+</span></code></pre>
+<p>Compiling this emits the following error (<a href="https://play.rust-lang.org/?gist=30e50b882b3b373ceb3bd9b9a3ca31d9">playground link</a>):</p>
+<pre style="background-color:#2e3440;color:#d8dee9;"><code><span>error: this must repeat at least once
+</span><span> --&gt; src/main.rs:3:10
+</span><span>  |
+</span><span>3 |         $( foo!(@discard $id); )+ // &lt;-- ⚠️
+</span><span>  |          ^^^^^^^^^^^^^^^^^^^^^^^
+</span></code></pre>
+<p>This shows that the assumption that all the repetition constraints are stated in
+the macro matcher is wrong, which means that we can't trust the documentation
+generated by <code>rustdoc</code> to tell if a macro invocation matches a given set of
+repetition constraints.</p>
+<h1 id="closing-thoughts-wait-no">Closing thoughts (wait no)<a class="zola-anchor" href="#closing-thoughts-wait-no" aria-label="Anchor link for: closing-thoughts-wait-no"><i class="fas fa-link"></i></a> 
+</h1>
+<p>This kind of pattern is quite easy to spot. It would be great to have a tool
+that checks that the repetition operator defined in the macro matcher matches
+the repetition operator defined in the macro transcriber. A tool with a silly
+pun in its name, with a huge picture of an American actor in its README.</p>
+<h1 id="community-feedback">Community feedback<a class="zola-anchor" href="#community-feedback" aria-label="Anchor link for: community-feedback"><i class="fas fa-link"></i></a> 
+</h1>
+<p>Somehow this article was reposted to the Rust Zulip, where more experienced
+people made interesting comments. Here's a summary:</p>
+<ul>
+<li>There are other sources of constraints, which are not shown in the macro
+matcher either. For instance, a macro may expand to a macro call, which
+may have its own constraints.</li>
+<li>The <code>meta_variable_misuse</code> lint does pretty much what I wanted to implement
+at first. It is not enabled by default because it can lead to false
+positives and false negatives. More infos in
+<a href="https://github.com/rust-lang/rust/issues/61053#issuecomment-509003694">rust-lang/rust#61053 (comment)</a>.</li>
+</ul>
+
+    </section>
+    <footer>
+        <nav class="c-pagination p-pagination">
+            <div class="c-pagination__ctrl">
+                <div class="c-pagination__newer">
+                    
+                </div>
+                <div class="c-pagination__older">
+                    
+                </div>
+            </div>
+        </nav>
+    </footer>
+</article>
+        </main>
+
+     
+      <footer class="l-footer">
+          <p class="p-copyright">
+              
+              Written by Sasha Pourcelot, delivered under the <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY SA v4.0</a> license. Black Lives Matter.
+          </p>
+      </footer>
+
+       
+      <link rel="stylesheet" href="https://scrabsha.github.io/css/katex.min.css">
+      <script defer src="https://scrabsha.github.io/js/katex.min.js"></script>
+      <script defer src="https://scrabsha.github.io/js/mathtex-script-type.min.js"></script>
+
+      <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) ?
+                "dark" : "default"
+        });
+      </script>
+    </body>
+</html>
+            

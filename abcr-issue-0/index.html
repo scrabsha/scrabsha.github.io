@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    
+
+        <meta charset="utf-8" />
+        <meta name="referrer" content="no-referrer">
+
+        <!-- Enable responsiveness on mobile devices-->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+
+        <title>A better cargo-readme - Issue 0: Humble Beginning | S🦀sha&#x27;s blog</title>
+<meta property="og:title" content="A better cargo-readme - Issue 0: Humble Beginning | S🦀sha&#x27;s blog" />
+<meta name="twitter:title" content="A better cargo-readme - Issue 0: Humble Beginning | S🦀sha&#x27;s blog" />
+
+        
+
+        <meta property="og:site_name" content="S🦀sha&#x27;s blog" />
+        <meta property="og:url" content="https:&#x2F;&#x2F;scrabsha.github.io" />
+
+        
+
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://scrabsha.github.io/base.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap" rel="stylesheet">
+        <link href="https://scrabsha.github.io/fontawesome/fontawesome.css" rel="stylesheet">
+        <link href="https://scrabsha.github.io/fontawesome/brands.css" rel="stylesheet">
+        <link href="https://scrabsha.github.io/fontawesome/solid.css" rel="stylesheet">
+
+        <link rel='icon' type='image/x-icon' href="https://scrabsha.github.io/favicon.ico" />
+
+        <link rel="alternate" type="application/atom+xml" title="S🦀sha&#x27;s blog" href="https://scrabsha.github.io/atom.xml">
+
+        
+
+    
+<meta name="google-site-verification" content="UtDJuq6YPYKUwTOMg9w-N0_zJOzt92Ooc1UbcWh1P_M" />
+
+    </head>
+
+    <body>
+        <a href="#main" class="skip-link p-screen-reader-text">Skip to content</a>
+        <header class="l-header">
+            <h1 class="c-title p-title"><a href="https:&#x2F;&#x2F;scrabsha.github.io" class="p-title__link">S🦀sha&#x27;s blog</a></h1>
+            <p class="p-subtitle">
+                Some thoughts about my computer science journey
+            </p>
+            </header>
+
+        <main id="main" class="l-main">
+            
+<article class="p-article">
+    <header>
+        <h1>A better cargo-readme - Issue 0: Humble Beginning
+</h1>
+        <div>
+            <div class="c-time">
+
+                <time datetime="2021-12-06">
+                    2021-12-06
+                </time>
+                
+                 - (10 min read)
+            </div>
+        </div>
+    </header>
+    
+    <section id="js-article" class="p-article__body">
+        <h1 id="introduction">Introduction<a class="zola-anchor" href="#introduction" aria-label="Anchor link for: introduction"><i class="fas fa-link"></i></a> 
+</h1>
+<p>I'm bad at writing READMEs for my Rust crates. Most of the time, I use <a href="https://github.com/livioribeiro/cargo-readme"><code>cargo-readme</code></a>. This program reads my code, extracts its crate-level documentation, and generates a cute README file, which will be displayed on <a href="https://crates.io">crates.io</a>. Let's consider the following small Rust crate:</p>
+<pre data-lang="rust" style="background-color:#2e3440;color:#d8dee9;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#616e88;">//! # My crate
+</span><span style="color:#616e88;">//!
+</span><span style="color:#616e88;">//! Here&#39;s some crate-level documentation.
+</span><span>
+</span><span style="color:#616e88;">/// A public data structure
+</span><span style="color:#81a1c1;">pub struct </span><span style="color:#8fbcbb;">S</span><span style="color:#eceff4;">;
+</span></code></pre>
+<p>When invoked on this crate, cargo-readme should generate the following markdown code:</p>
+<pre data-lang="markdown" style="background-color:#2e3440;color:#d8dee9;" class="language-markdown "><code class="language-markdown" data-lang="markdown"><span style="color:#88c0d0;"># abcr_step0
+</span><span>
+</span><span style="color:#88c0d0;">## My crate
+</span><span>
+</span><span>Here&#39;s some crate-level documentation
+</span></code></pre>
+<p>The goal of cargo-readme is to make the README file rendered on <a href="https://crates.io">crates.io</a> very close to what the user would read if they open the crate documentation on <a href="https://docs.rs">docs.rs</a>. It is used in real-world Rust crates such as <code>bumpalo</code> (compare its <a href="https://github.com/fitzgen/bumpalo/blob/master/README.md#bumpalo">README</a> and its <a href="https://docs.rs/bumpalo/latest">actual documentation</a>). So far so good.</p>
+<p>I recently open-sourced <a href="https://docs.rs/dep_doc/latest/dep_doc/"><code>dep_doc</code></a>, which uses macros to generate a cute dependency declaration snippet. To explain it briefly, the user can add a <code>#![doc = dep_doc::dep_doc!()]</code> somewhere in their crate-level documentation, and the following code snippet will be automatically generated in the crate documentation:</p>
+<pre data-lang="TOML" style="background-color:#2e3440;color:#d8dee9;" class="language-TOML "><code class="language-TOML" data-lang="TOML"><span>[dependencies]
+</span><span style="color:#81a1c1;">CRATE_NAME </span><span>= </span><span style="color:#a3be8c;">&quot;CRATE_VERSION&quot;
+</span></code></pre>
+<p>What's interesting here is that <code>CRATE_NAME</code> and <code>CRATE_VERSION</code> are guaranteed to always refer to the current crate name and version, which prevents the users from forgetting to update the snippet before releasing.</p>
+<p>Let's add a call to <a href="https://docs.rs/dep_doc/latest/dep_doc/"><code>dep_doc</code></a> to our crate to see if it handles our macro:</p>
+<pre data-lang="rust" style="background-color:#2e3440;color:#d8dee9;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#616e88;">//! # My crate
+</span><span style="color:#616e88;">//!
+</span><span>#![doc </span><span style="color:#81a1c1;">= </span><span>dep_doc::dep_doc!()]
+</span><span style="color:#616e88;">//!
+</span><span style="color:#616e88;">//! Here&#39;s some crate-level documentation
+</span><span>
+</span><span style="color:#616e88;">/// A public data structure
+</span><span style="color:#81a1c1;">pub struct </span><span style="color:#8fbcbb;">S</span><span style="color:#eceff4;">;
+</span></code></pre>
+<p>This gives us the following:</p>
+<pre data-lang="markdown" style="background-color:#2e3440;color:#d8dee9;" class="language-markdown "><code class="language-markdown" data-lang="markdown"><span style="color:#88c0d0;"># abcr_step0
+</span><span>
+</span><span style="color:#88c0d0;">## My crate
+</span></code></pre>
+<p>That's a bit embarassing. It should generate something like:</p>
+<pre data-lang="markdown" style="background-color:#2e3440;color:#d8dee9;" class="language-markdown "><code class="language-markdown" data-lang="markdown"><span style="color:#88c0d0;"># abcr_step0
+</span><span>
+</span><span style="color:#8fbcbb;">```</span><span>TOML
+</span><span>[dependencies]
+</span><span>abcr-step0 = &quot;0.1.0&quot;
+</span><span style="color:#8fbcbb;">```
+</span><span>
+</span><span style="color:#88c0d0;">## My crate
+</span><span>
+</span><span>Here&#39;s some crate-level documentation
+</span></code></pre>
+<p>This means that <a href="https://docs.rs/dep_doc/latest/dep_doc/"><code>dep_doc</code></a> will break the README file of every Rustacean who use it. In order to understand why, we need to dive in <a href="https://github.com/livioribeiro/cargo-readme"><code>cargo-readme</code></a>'s source code. The whole algorithm is available in <a href="https://github.com/livioribeiro/cargo-readme/blob/master/src/readme/extract.rs"><code>src/readme/extract.rs</code></a>. To explain it briefly, it iterates over each line of the crate's <code>src/lib.rs</code> and saves every line which starts with <code>//!</code>, until it meets a line which starts with something else. This is fine for simple use case, but it will mess up each time it encounters something more complex, including macros.</p>
+<p>Once the crate-level documentation is extracted, very little processing is performed. Specifically, <code>#</code> headers are transformed in <code>##</code> headers and so on. As far as I know, no additional processing is performed. This means that intra-doc links are broken in the README file. Let's add one to our example snippet:</p>
+<pre data-lang="rust" style="background-color:#2e3440;color:#d8dee9;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#616e88;">//! # My crate
+</span><span style="color:#616e88;">//!
+</span><span style="color:#616e88;">//! The [`Cow`] says moo 🐮
+</span><span style="color:#616e88;">//!
+</span><span>#![doc </span><span style="color:#81a1c1;">= </span><span>dep_doc::dep_doc!()]
+</span><span style="color:#616e88;">//!
+</span><span style="color:#616e88;">//! Here&#39;s some crate-level documentation
+</span><span>
+</span><span style="color:#81a1c1;">use </span><span>std</span><span style="color:#81a1c1;">::</span><span>borrow</span><span style="color:#81a1c1;">::</span><span>Cow</span><span style="color:#eceff4;">;
+</span><span>
+</span><span style="color:#616e88;">/// A public data structure
+</span><span style="color:#81a1c1;">pub struct </span><span style="color:#8fbcbb;">S</span><span style="color:#eceff4;">;
+</span></code></pre>
+<p>This is rendered as:</p>
+<pre data-lang="markdown" style="background-color:#2e3440;color:#d8dee9;" class="language-markdown "><code class="language-markdown" data-lang="markdown"><span style="color:#88c0d0;"># abcr_step0
+</span><span>
+</span><span style="color:#88c0d0;">## My crate
+</span><span>
+</span><span>The [</span><span style="color:#8fbcbb;">`Cow`</span><span>] says moo 🐮
+</span></code></pre>
+<p>See? The intra-doc link has been copied <em>as is</em> with no change whatsoever.</p>
+<p>The problem here comes from the fact that <a href="https://github.com/livioribeiro/cargo-readme"><code>cargo-readme</code></a> takes a naive approach. Most notably, a Rust program is not a sequence of lines that we can analyze one after another in a single pass. Instead, it is a complete syntax tree where every node obeys to some special rules. It would make more sense to parse the input code instead of blindly generate the README file one line after another.</p>
+<p>Parsing the input code is the approach that <a href="https://github.com/msrd0/cargo-doc2readme"><code>cargo-doc2readme</code></a> takes. To explain briefly, it uses <a href="https://github.com/dtolnay/syn"><code>syn</code></a> to create a syntax tree, extracts the imports and the crate documentation, resolves the intra-doc links thanks to the imports, and generates the output README file.</p>
+<p>This approach is a very good idea, but the problem is that we're processing raw syntax tree, which means that we can't have macro expansion. There's a little trick in which you parse the output of <code>cargo expand</code> instead of the <code>src/lib.rs</code> file. Actually, we're not calling <code>cargo expand</code>, but invoking Rustc with the correct command-line arguments. The idea is the same. This definitely works, but in my opinion, this is more a hack than an actual solution.</p>
+<p>In this blogpost series, we will build our own <code>cargo-readme</code> tool. Instead of reading the input line by line, or traversing the crate's AST, we will use already-existing Rust tools to gather everything for us and retrieve data that has already been processed. We will try to implement as little algorithms as possible and rely as much as possible on Rust tools.</p>
+<p>In this zeroth issue, we will focus on describing a new approach and show that it is good enough to solve our problem. We won't write Rust code at all. Instead, we will use high-level tools and bash commands.</p>
+<h1 id="the-basic-idea">The basic idea<a class="zola-anchor" href="#the-basic-idea" aria-label="Anchor link for: the-basic-idea"><i class="fas fa-link"></i></a> 
+</h1>
+<p>There's a well-known Rust tool that is responsible (among others) for expanding macros, extracting documentation and resolving intra-doc links. It is <code>rustdoc</code> itself. <code>rustdoc</code> is the command-line tool that is invoked by <code>cargo</code> each time a <code>cargo doc</code> is performed. It takes whole crate code, extracts the documentation for the public API and generates a bunch of wonderful HTML files that can be viewed in a browser. As far as i know, this tool is the only documentation generation tool in the Rust ecosystem. It would be very good if it could output something else than an HTML page. Let's look at its help page:</p>
+<pre style="background-color:#2e3440;color:#d8dee9;"><code><span>$ rustdoc --help
+</span><span>rustdoc [options] &lt;input&gt;
+</span><span>
+</span><span>Options:
+</span><span>    -h, --help          show this help message
+</span><span>    -V, --version       print rustdoc&#39;s version
+</span><span>    -v, --verbose       use verbose output
+</span><span>    -r, --input-format [rust]
+</span><span>                        the input type of the specified file
+</span><span>    -w, --output-format [html]
+</span><span>
+</span><span>&lt;output skipped for brevity&gt;
+</span></code></pre>
+<p>The <code>-w</code> option looks promising. By looking at <a href="https://doc.rust-lang.org/rustdoc/unstable-features.html#-w--output-format-output-format">its documentation</a>, we can learn that it is an <em>unstable feature</em> which accepts <code>json</code> and <code>html</code> as parameter. We could use the <code>json</code> output to extract the information we need. As this is an unstable feature, will use nightly toolchain (unless we use <a href="https://rustc-dev-guide.rust-lang.org/building/bootstrapping.html#complications-of-bootstrapping">the forbidden environment variable</a>, but that's not a good idea).</p>
+<p>Let's run <code>rustdoc</code> with the <code>json</code> output format:</p>
+<pre style="background-color:#2e3440;color:#d8dee9;"><code><span>$ cargo +nightly rustdoc -- -Zunstable-options -wjson
+</span><span>Checking dep_doc v0.1.1
+</span><span> Documenting abcr-step0 v0.1.0 (/tmp/abcr-step0)
+</span><span>    Finished dev [unoptimized + debuginfo] target(s) in 4.44s
+</span></code></pre>
+<p>I expected the output to be printed to stdout, but nothing appeared. Let's look at the <code>target</code> directory:</p>
+<pre style="background-color:#2e3440;color:#d8dee9;"><code><span>$ tree target/
+</span><span>target/
+</span><span>├── CACHEDIR.TAG
+</span><span>├── debug
+</span><span>│   ├── build
+</span><span>│   ├── deps
+</span><span>│   │   ├── dep_doc-31d529d57f7de8bf.d
+</span><span>│   │   └── libdep_doc-31d529d57f7de8bf.rmeta
+</span><span>│   ├── examples
+</span><span>│   └── incremental
+</span><span>└── doc
+</span><span>    └── abcr_step0.json
+</span><span>
+</span><span>6 directories, 4 files
+</span></code></pre>
+<p>It looks like we're looking for the <code>target/doc/abcr_step0.json</code> file. Let's get a very rough estimate of the amount of data in it:</p>
+<pre style="background-color:#2e3440;color:#d8dee9;"><code><span>$ cat target/doc/abcr_step0.json | jq | wc -l
+</span><span>32034
+</span></code></pre>
+<p>Don't know what jq is? We'll discuss it shortly in the next section. For now, what matter is that the <code>cargo rustdoc</code> command we issued previously extracted a huge amount of data from the crate. We will use it to generate the appropriate README.</p>
+<h1 id="using-jq-to-prove-that-it-s-possible">Using jq to prove that it's possible<a class="zola-anchor" href="#using-jq-to-prove-that-it-s-possible" aria-label="Anchor link for: using-jq-to-prove-that-it-s-possible"><i class="fas fa-link"></i></a> 
+</h1>
+<p><a href="https://stedolan.github.io/jq/"><code>jq</code></a> is a command-line tool which allows to extract data from JSON documents. We'll use it in order to extract specific pieces of the <code>rustdoc</code> output, and hopefully prove that we have everything needed for the README generation.</p>
+<p>The JSON document follows a specific structure defined in the <code>rustdoc_json_types</code>'s <a href="https://doc.rust-lang.org/nightly/nightly-rustc/rustdoc_json_types/struct.Crate.html"><code>Crate</code></a> datatype. Knowing where and how each data is stored will allow us to write the correct <code>jq</code> commands.</p>
+<h2 id="extracting-the-crate-level-documentation">Extracting the crate-level documentation<a class="zola-anchor" href="#extracting-the-crate-level-documentation" aria-label="Anchor link for: extracting-the-crate-level-documentation"><i class="fas fa-link"></i></a> 
+</h2>
+<p>After a few minutes of diving in the data structures, we can see that all the items that are reachable from the crate are located in the <a href="https://doc.rust-lang.org/nightly/nightly-rustc/rustdoc_json_types/struct.Crate.html#structfield.index"><code>index</code></a> field. This field is a JSON dictionary whose keys are compiler-generated <a href="https://doc.rust-lang.org/nightly/nightly-rustc/rustdoc_json_types/struct.Id.html"><code>Id</code></a>s and values are metadata of the reachable items. Additionally, there is a <a href="https://doc.rust-lang.org/nightly/nightly-rustc/rustdoc_json_types/struct.Crate.html#structfield.root"><code>root</code></a> field, which tells us which key in the index map will give us the documentation for the crate's root module.</p>
+<p>Let's try to write a command which extracts the crate-level documentation using <code>jq</code>:</p>
+<pre style="background-color:#2e3440;color:#d8dee9;"><code><span>$ cat target/doc/abcr_step0.json | jq &#39;{docs: .index[.root].docs}&#39;
+</span><span>{
+</span><span>  &quot;docs&quot;: &quot;# My crate\n\nThe [`Cow`] says moo 🐮\n\n```TOML\n[dependencies]\nabcr_step0 = \&quot;0.1.0\&quot;\n```\n\nHere&#39;s some crate-level documentation&quot;
+</span><span>}
+</span></code></pre>
+<p>We did it! We managed to extract the crate documentation from the rustdoc-generated file. Additionally, the macros are expanded, which instantly solves one of our initial requirements.</p>
+<h2 id="extracting-intra-doc-link-resolution">Extracting intra-doc link resolution<a class="zola-anchor" href="#extracting-intra-doc-link-resolution" aria-label="Anchor link for: extracting-intra-doc-link-resolution"><i class="fas fa-link"></i></a> 
+</h2>
+<p>By looking at the documentation for <a href="https://doc.rust-lang.org/nightly/nightly-rustc/rustdoc_json_types/struct.Item.html"><code>Item</code></a>, we can update our command to extract the <a href="https://doc.rust-lang.org/nightly/nightly-rustc/rustdoc_json_types/struct.Item.html#structfield.links"><code>links</code></a> as well:</p>
+<pre style="background-color:#2e3440;color:#d8dee9;"><code><span>$ cat target/doc/abcr_step0.json | jq &#39;{ docs: .index[.root].docs, links: .index[.root].links }&#39;
+</span><span>{
+</span><span>  &quot;docs&quot;: &quot;# My crate\n\n```TOML\n[dependencies]\nabcr_step0 = \&quot;0.1.0\&quot;\n```\n\nHere&#39;s some crate-level documentation\n\nHere&#39;s a link to [`Cow`].&quot;,
+</span><span>  &quot;links&quot;: {
+</span><span>    &quot;`Cow`&quot;: &quot;5:546&quot;
+</span><span>  }
+</span><span>}
+</span></code></pre>
+<p>This returns the <a href="https://doc.rust-lang.org/nightly/nightly-rustc/rustdoc_json_types/struct.Id.html"><code>Id</code></a> of the <a href="https://doc.rust-lang.org/nightly/nightly-rustc/rustdoc_json_types/struct.Item.html"><code>Item</code></a> that is linked. Let's see if we can retrieve its path:</p>
+<pre style="background-color:#2e3440;color:#d8dee9;"><code><span>$ cat target/doc/abcr_step0.json | jq &#39;{ links_to_cow: .paths.&quot;5:546&quot;.path }&#39;
+</span><span>{
+</span><span>  &quot;links_to_cow&quot;: [
+</span><span>    &quot;alloc&quot;,
+</span><span>    &quot;borrow&quot;,
+</span><span>    &quot;Cow&quot;
+</span><span>  ]
+</span><span>}
+</span></code></pre>
+<p>This proves that we can retrieve the path to the item that is linked. Awesome.</p>
+<p>We could spend time writing a more complex <code>jq</code> command which fetches the intra-doc links and resolves all of them in one pass, but the goal here is to prove that it is possible, rather than building a complete tool using half-backed shell commands.</p>
+<h1 id="conclusion">Conclusion<a class="zola-anchor" href="#conclusion" aria-label="Anchor link for: conclusion"><i class="fas fa-link"></i></a> 
+</h1>
+<p>In this blogpost we listed the different README generators in the Rust ecosystem. We explained their different approaches and detailed their pros and cons. Finally, we suggested that we could use an already-existing Rust tool, <code>rustdoc</code>, to gather data for us, and analyze it ourselves.</p>
+<p>Next issue will focus on writing an actual Rust program which extracts crate-level documentation, and prints it in the terminal.</p>
+<p>This issue was reviewed by volunteers who gave me a lot of feedback. They are, in alphabetical order:</p>
+<ul>
+<li><a href="https://twitter.com/miguelraz_">Julia REPL stan account</a>,</li>
+<li><a href="https://twitter.com/heymingwei">Mingwei Zhang 🦀</a>,</li>
+<li><a href="https://twitter.com/natsukoow">Natsukoh</a>,</li>
+<li><a href="https://twitter.com/yozhgoor">Yozhgoor 🦀</a>.</li>
+</ul>
+<p>Initial release of the blogpost used a hardcoded <code>id</code> to retrieve the crate-level documentation. <a href="https://github.com/aDotInTheVoid">@aDotInTheVoid</a> suggested to use the <code>root</code> field instead. Thanks!</p>
+<p>If you're interested in reviewing the next articles or implementation, don't hesitate to message me on Twitter. I gladly welcome any kind of constructive feedback.</p>
+
+    </section>
+    <footer>
+        <nav class="c-pagination p-pagination">
+            <div class="c-pagination__ctrl">
+                <div class="c-pagination__newer">
+                    
+                </div>
+                <div class="c-pagination__older">
+                    
+                </div>
+            </div>
+        </nav>
+    </footer>
+</article>
+        </main>
+
+     
+      <footer class="l-footer">
+          <p class="p-copyright">
+              
+              Written by Sasha Pourcelot, delivered under the <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY SA v4.0</a> license. Black Lives Matter.
+          </p>
+      </footer>
+
+       
+      <link rel="stylesheet" href="https://scrabsha.github.io/css/katex.min.css">
+      <script defer src="https://scrabsha.github.io/js/katex.min.js"></script>
+      <script defer src="https://scrabsha.github.io/js/mathtex-script-type.min.js"></script>
+
+      <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) ?
+                "dark" : "default"
+        });
+      </script>
+    </body>
+</html>
+            

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    
+
+        <meta charset="utf-8" />
+        <meta name="referrer" content="no-referrer">
+
+        <!-- Enable responsiveness on mobile devices-->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+
+        <title>Support for the ClickHouse database in Tremor | S🦀sha&#x27;s blog</title>
+<meta property="og:title" content="Support for the ClickHouse database in Tremor | S🦀sha&#x27;s blog" />
+<meta name="twitter:title" content="Support for the ClickHouse database in Tremor | S🦀sha&#x27;s blog" />
+
+        
+
+        <meta property="og:site_name" content="S🦀sha&#x27;s blog" />
+        <meta property="og:url" content="https:&#x2F;&#x2F;scrabsha.github.io" />
+
+        
+
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://scrabsha.github.io/base.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap" rel="stylesheet">
+        <link href="https://scrabsha.github.io/fontawesome/fontawesome.css" rel="stylesheet">
+        <link href="https://scrabsha.github.io/fontawesome/brands.css" rel="stylesheet">
+        <link href="https://scrabsha.github.io/fontawesome/solid.css" rel="stylesheet">
+
+        <link rel='icon' type='image/x-icon' href="https://scrabsha.github.io/favicon.ico" />
+
+        <link rel="alternate" type="application/atom+xml" title="S🦀sha&#x27;s blog" href="https://scrabsha.github.io/atom.xml">
+
+        
+
+    
+<meta name="google-site-verification" content="UtDJuq6YPYKUwTOMg9w-N0_zJOzt92Ooc1UbcWh1P_M" />
+
+    </head>
+
+    <body>
+        <a href="#main" class="skip-link p-screen-reader-text">Skip to content</a>
+        <header class="l-header">
+            <h1 class="c-title p-title"><a href="https:&#x2F;&#x2F;scrabsha.github.io" class="p-title__link">S🦀sha&#x27;s blog</a></h1>
+            <p class="p-subtitle">
+                Some thoughts about my computer science journey
+            </p>
+            </header>
+
+        <main id="main" class="l-main">
+            
+<article class="p-article">
+    <header>
+        <h1>Support for the ClickHouse database in Tremor
+</h1>
+        <div>
+            <div class="c-time">
+
+                <time datetime="2022-07-05">
+                    2022-07-05
+                </time>
+                
+                 - (6 min read)
+            </div>
+        </div>
+    </header>
+    
+    <section id="js-article" class="p-article__body">
+        <p><em>This article was originally posted on <a href="https://www.tremor.rs/blog/2022/07/07/LFX-Blog-Sasha">Tremor's blog</a>.</em></p>
+<h1 id="introduction">Introduction<a class="zola-anchor" href="#introduction" aria-label="Anchor link for: introduction"><i class="fas fa-link"></i></a> 
+</h1>
+<p>I'm Sasha, a Computer Science student living in south-eastern France. I contributed to Tremor as part of the <a href="https://mentorship.lfx.linuxfoundation.org/project/5c828028-f91c-4969-b4de-9efdb27bb869">Database Connector mentorship</a> proposed by the <a href="https://lfx.linuxfoundation.org/tools/mentorship/">LFX Mentorship Program</a> for Spring 2022. I was mentored by Matthias Wahl and got help from Darach Ennis, Heinz Gies and Ramona Łuczkiewicz.</p>
+<p>This blogpost summarizes my work at Tremor as a mentee and shows what could be done next.</p>
+<h1 id="about-tremor">About Tremor<a class="zola-anchor" href="#about-tremor" aria-label="Anchor link for: about-tremor"><i class="fas fa-link"></i></a> 
+</h1>
+<p>Tremor is an event processing system with the goal of allowing users to handle a high volume of messages by viewing them as a stream flowing between different nodes of a graph. Events go in and out of this graph thanks to connectors.</p>
+<p>The interactions between each node and the connector configuration are defined using the <a href="https://www.tremor.rs/docs/edge/language/"><code>troy</code></a> programming language.</p>
+<h1 id="abstract">Abstract<a class="zola-anchor" href="#abstract" aria-label="Anchor link for: abstract"><i class="fas fa-link"></i></a> 
+</h1>
+<p>My mentorship at Tremor was focused on building a connector for the <a href="https://clickhouse.com/">ClickHouse</a> database engine. More specifically, I was focused on the <em>sink</em> part, the one that allows data to flow out of the Tremor application.</p>
+<p><a href="https://clickhouse.com/">ClickHouse</a> is a database management system designed to allow for real-time analysis of high volumes of non-aggregated data. Its initial goal was to power the Yandex.Metrica analytics platform.</p>
+<h1 id="the-clickhouse-connector">The ClickHouse connector<a class="zola-anchor" href="#the-clickhouse-connector" aria-label="Anchor link for: the-clickhouse-connector"><i class="fas fa-link"></i></a> 
+</h1>
+<p>The next subsections describe what I did during the mentorship.</p>
+<h2 id="interacting-with-a-clickhouse-database-in-rust">Interacting with a ClickHouse database in Rust<a class="zola-anchor" href="#interacting-with-a-clickhouse-database-in-rust" aria-label="Anchor link for: interacting-with-a-clickhouse-database-in-rust"><i class="fas fa-link"></i></a> 
+</h2>
+<p>My first goal was to find a way to send requests to a ClickHouse node from a Rust program. It was a good start because it allowed me to experiment on the ClickHouse side without caring about what was happening in Tremor. I spent around three weeks playing on a separate repository named <a href="https://github.com/scrabsha/plays-with-clickhouse"><code>scrabsha/plays-with-clickhouse</code></a> and getting extensive knowledge from Matthias about how Tremor works from the inside.</p>
+<p>I found two Rust crates that could help us send requests to a ClickHouse database: <a href="https://crates.io/crates/clickhouse"><code>clickhouse</code></a> and <a href="https://crates.io/crates/clickhouse-rs"><code>clickhouse-rs</code></a>. <code>clickhouse</code> is the first one I considered. I had to discard it because it was focused on concrete Rust types and needed to know <em>at compile time</em> what each datatype is composed of. The second crate was a bit more low-level and allowed us to do what we need.</p>
+<h2 id="writing-a-super-simple-sink">Writing a super simple sink<a class="zola-anchor" href="#writing-a-super-simple-sink" aria-label="Anchor link for: writing-a-super-simple-sink"><i class="fas fa-link"></i></a> 
+</h2>
+<p>Once I got every ClickHouse detail right, I started playing with the Tremor side. There were multiple connectors already implemented in Tremor. I picked the simplest ones and started copying parts of it and quickly got something working.</p>
+<p>The only challenge I encountered is that Tremor defines its own <code>Value</code> type, representing a value whose type is not really known at compile time, and uses it <em>a lot</em>. It was a bit disconcerting doing such things in Rust, as I felt I was writing dynamically-typed code in a statically-typed language, but I managed to get through it.</p>
+<h2 id="converting-tremor-values-to-clickhouse-values">Converting Tremor values to ClickHouse values<a class="zola-anchor" href="#converting-tremor-values-to-clickhouse-values" aria-label="Anchor link for: converting-tremor-values-to-clickhouse-values"><i class="fas fa-link"></i></a> 
+</h2>
+<p>Once I was able to insert data in a database from Tremor, I started writing a conversion bridge for ClickHouse types, i.e. something that would handle the conversion of native Tremor values to their corresponding ClickHouse types. </p>
+<p>Most of the conversions are quite simple: an integer can be obtained from an integer, a string can be obtained from any string, and so on.</p>
+<p>Some other conversions were less obvious. For instance, in order to create a ClickHouse IPv4 type, we could either use a string representing the address, or an array of four integers. The goal was to make every ClickHouse type constructible from a Tremor value. I tried to make every conversion as obvious as possible, and to document them as much as possible.</p>
+<p>The first implementation of this mapping function was huge. It was about 250 lines of tricky and slightly incorrect code. I managed to rewrite it from scratch using another approach and it got way better.</p>
+<p>Working on this specific part led me to open three pull request to the <code>clickhouse-rs</code> crate:</p>
+<ul>
+<li><a href="https://github.com/suharev7/clickhouse-rs/pull/171">Make Value fully constructible (#171)</a></li>
+<li><a href="https://github.com/suharev7/clickhouse-rs/pull/172">Compare IP adresses properly (#172)</a></li>
+<li><a href="https://github.com/suharev7/clickhouse-rs/pull/173">Allow for Enum8 and DateTime64 value comparison (#173)</a></li>
+</ul>
+<h2 id="testing">Testing<a class="zola-anchor" href="#testing" aria-label="Anchor link for: testing"><i class="fas fa-link"></i></a> 
+</h2>
+<p>The conversion function described in the previous subsection was fairly complex. Each possible conversion and cast has been carefully tested in order to ensure that it behaves correctly. These tests were greatly simplified thanks to the use of declarative macro.</p>
+<p>Some other tests were focused on testing the sink as a whole, and how it would interact with a ClickHouse database. In this kind of test, we would run ClickHouse Docker containers, create a ClickHouse sink, plug the sink to the container, send some events, and see what has been inserted in the ClickHouse side.</p>
+<h1 id="what-to-do-next">What to do next?<a class="zola-anchor" href="#what-to-do-next" aria-label="Anchor link for: what-to-do-next"><i class="fas fa-link"></i></a> 
+</h1>
+<h2 id="improving-the-sink">Improving the sink<a class="zola-anchor" href="#improving-the-sink" aria-label="Anchor link for: improving-the-sink"><i class="fas fa-link"></i></a> 
+</h2>
+<h3 id="automatically-getting-the-table-schema">Automatically getting the table schema<a class="zola-anchor" href="#automatically-getting-the-table-schema" aria-label="Anchor link for: automatically-getting-the-table-schema"><i class="fas fa-link"></i></a> 
+</h3>
+<p>It turns out that ClickHouse has a <a href="https://clickhouse.com/docs/en/sql-reference/statements/describe-table"><code>DESCRIBE TABLE</code> statement</a>, which allows to gather information about each column of a specific table. We currently rely on the end-user to provide us valid information about the table columns. Using this statement would reduce the amount of information we require from them, hence making it simpler to use.</p>
+<h3 id="inserting-data-concurrently">Inserting data concurrently<a class="zola-anchor" href="#inserting-data-concurrently" aria-label="Anchor link for: inserting-data-concurrently"><i class="fas fa-link"></i></a> 
+</h3>
+<p>The current implementation of the ClickHouse container uses a single database connection object, which is reused across insertions. A good way to improve this system is to use multiple concurrent connections, so that we could insert multiple batch of events at once.</p>
+<p>A similar pattern has already been implemented in Tremor as part of the <a href="https://www.tremor.rs/docs/edge/reference/connectors/elastic"><code>elastic</code></a> connector. As such, most of the required machinery is already there.</p>
+<h2 id="the-source-part">The source part<a class="zola-anchor" href="#the-source-part" aria-label="Anchor link for: the-source-part"><i class="fas fa-link"></i></a> 
+</h2>
+<p>This mentorship was focused on building a sink for ClickHouse. The next step could be to add a source connector, so that coming from a ClickHouse database can be ingested directly into a Tremor application.</p>
+<p>ClickHouse has a feature allowing to watch for updates in a given table. This way, we can simulate a stream of data, and make it flow in the Tremor system. Each time some data is inserted in the table, we can retrieve it, convert it into Tremor value and make it flow into the graph of nodes described earlier.</p>
+<p>This is something that we totally want to see in Tremor in the future. We can't wait for the <a href="https://clickhouse.com/docs/en/sql-reference/statements/watch/"><code>WATCH</code> statement</a> to be considered stable.</p>
+
+    </section>
+    <footer>
+        <nav class="c-pagination p-pagination">
+            <div class="c-pagination__ctrl">
+                <div class="c-pagination__newer">
+                    
+                </div>
+                <div class="c-pagination__older">
+                    
+                </div>
+            </div>
+        </nav>
+    </footer>
+</article>
+        </main>
+
+     
+      <footer class="l-footer">
+          <p class="p-copyright">
+              
+              Written by Sasha Pourcelot, delivered under the <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY SA v4.0</a> license. Black Lives Matter.
+          </p>
+      </footer>
+
+       
+      <link rel="stylesheet" href="https://scrabsha.github.io/css/katex.min.css">
+      <script defer src="https://scrabsha.github.io/js/katex.min.js"></script>
+      <script defer src="https://scrabsha.github.io/js/mathtex-script-type.min.js"></script>
+
+      <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) ?
+                "dark" : "default"
+        });
+      </script>
+    </body>
+</html>
+            

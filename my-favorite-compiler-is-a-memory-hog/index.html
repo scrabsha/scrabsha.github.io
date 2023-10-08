@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    
+
+        <meta charset="utf-8" />
+        <meta name="referrer" content="no-referrer">
+
+        <!-- Enable responsiveness on mobile devices-->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+
+        <title>My favorite compiler is a memory hog | S🦀sha&#x27;s blog</title>
+<meta property="og:title" content="My favorite compiler is a memory hog | S🦀sha&#x27;s blog" />
+<meta name="twitter:title" content="My favorite compiler is a memory hog | S🦀sha&#x27;s blog" />
+
+        
+
+        <meta property="og:site_name" content="S🦀sha&#x27;s blog" />
+        <meta property="og:url" content="https:&#x2F;&#x2F;scrabsha.github.io" />
+
+        
+
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://scrabsha.github.io/base.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap" rel="stylesheet">
+        <link href="https://scrabsha.github.io/fontawesome/fontawesome.css" rel="stylesheet">
+        <link href="https://scrabsha.github.io/fontawesome/brands.css" rel="stylesheet">
+        <link href="https://scrabsha.github.io/fontawesome/solid.css" rel="stylesheet">
+
+        <link rel='icon' type='image/x-icon' href="https://scrabsha.github.io/favicon.ico" />
+
+        <link rel="alternate" type="application/atom+xml" title="S🦀sha&#x27;s blog" href="https://scrabsha.github.io/atom.xml">
+
+        
+
+    
+<meta name="google-site-verification" content="UtDJuq6YPYKUwTOMg9w-N0_zJOzt92Ooc1UbcWh1P_M" />
+
+    </head>
+
+    <body>
+        <a href="#main" class="skip-link p-screen-reader-text">Skip to content</a>
+        <header class="l-header">
+            <h1 class="c-title p-title"><a href="https:&#x2F;&#x2F;scrabsha.github.io" class="p-title__link">S🦀sha&#x27;s blog</a></h1>
+            <p class="p-subtitle">
+                Some thoughts about my computer science journey
+            </p>
+            </header>
+
+        <main id="main" class="l-main">
+            
+<article class="p-article">
+    <header>
+        <h1>My favorite compiler is a memory hog
+</h1>
+        <div>
+            <div class="c-time">
+
+                <time datetime="2022-08-22">
+                    2022-08-22
+                </time>
+                
+                 - (8 min read)
+            </div>
+        </div>
+    </header>
+    
+    <section id="js-article" class="p-article__body">
+        <p>Alternative title: <em>why my program needs 1267650600228229401496703205376 gigabytes of RAM to (fail to) compile</em></p>
+<p>Alternative<sup>2</sup> title: <em>Boring Coworker? Make Their Laptop Unresponsive For Fun And Profit</em></p>
+<p>Alternative<sup>3</sup> title: <em>why recursion limit is not enough</em></p>
+<p>Alternative<sup>4</sup> title: <em>recursion limit? We don't do that here</em></p>
+<p>Alternative<sup>5</sup> title: <em>[see <code>Alternative title</code>]</em></p>
+<h1 id="introduction">Introduction<a class="zola-anchor" href="#introduction" aria-label="Anchor link for: introduction"><i class="fas fa-link"></i></a> 
+</h1>
+<p>I love Rust declarative macros. They allow performing super elegant code transformations. They are so powerful that we can use them to parse literally anything, but their core syntax is so simple that one could write their first macro in less than an hour.</p>
+<p>The downside of this is that... well... these macros are <em>too</em> powerful. Once they get very complex, a single typo can take hours to be fixed. Even worse, it can drive your compiler crazy. Today, we'll see how one can turn <code>rustc</code> into an unbounded memory allocator stresstest.</p>
+<h1 id="background-a-handful-of-cursed-macros">Background - a handful of cursed macros<a class="zola-anchor" href="#background-a-handful-of-cursed-macros" aria-label="Anchor link for: background-a-handful-of-cursed-macros"><i class="fas fa-link"></i></a> 
+</h1>
+<p>I won't get into too many details there. I'll present the actual macros in a later blogpost.</p>
+<p>At a very high level, this macro was recursive. It captured every token passed to it, processed the first tokens, and called itself again with the remaining, unprocessed tokens as arguments.</p>
+<p>We have a fancy word for this: <a href="https://danielkeep.github.io/tlborm/book/pat-incremental-tt-munchers.html">TT muncher</a>.</p>
+<h1 id="guaranteeing-that-a-program-terminates">Guaranteeing that a program terminates<a class="zola-anchor" href="#guaranteeing-that-a-program-terminates" aria-label="Anchor link for: guaranteeing-that-a-program-terminates"><i class="fas fa-link"></i></a> 
+</h1>
+<p>It's kinda easy to accidentally create code that never stops and just basically hangs the program. Some languages are designed so that the compiler can detect and reject any code which may hang the program. Rust designers decided it was ok to hang. Sometimes.</p>
+<p>In the whole lifetime of a Rust crate, there are two very distinct steps at which different pieces of code are run. At compile-time, the macros are expanded, while at runtime, macro-expanded Rust code is run.</p>
+<p>Macros in Rust are defined using a specific language that maps quite well to a purely functional programming language, where mutability and side effects are disallowed. As this language makes extensive use of recursion, there's a very elegant way to make sure that macros expansion actually terminates: the compiler tries to expand the macro, but if too many recursions are performed, then it just stops, telling that some kind of limit has been reached. This way, we are guaranteed that macros eventually stop expanding, and nobody should ever write an overly specific blogpost about macros allocating memory indefinitely.</p>
+<p>Regular Rust code is... well... one <code>loop {}</code> away from hanging forever. Hanging at runtime is something we may want to happen. For instance, a REST backend may spend a few milliseconds waiting for an incoming request, dispatch it to a thread, and go back to its initial idle state.</p>
+<h1 id="getting-our-hands-dirty-with-macros">Getting our hands dirty with macros<a class="zola-anchor" href="#getting-our-hands-dirty-with-macros" aria-label="Anchor link for: getting-our-hands-dirty-with-macros"><i class="fas fa-link"></i></a> 
+</h1>
+<p>It is quite easy to write a function that never finishes: just replace its body with <code>loop {}</code>, and we're good to go. Similarly, one can easily write a macro that calls itself.</p>
+<p>Something like (<a href="https://play.rust-lang.org/?version=stable&amp;mode=debug&amp;edition=2021&amp;gist=789b24d0d3ddcfd4a1ce1c0617cea55b">playground link</a>):</p>
+<pre data-lang="rust" style="background-color:#2e3440;color:#d8dee9;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#88c0d0;">macro_rules! </span><span>never_stops_compiling {
+</span><span>    () </span><span style="color:#81a1c1;">=&gt; </span><span>{
+</span><span>        never_stops_compiling!()
+</span><span>    }</span><span style="color:#eceff4;">;
+</span><span>}
+</span><span>
+</span><span style="color:#81a1c1;">fn </span><span style="color:#88c0d0;">main</span><span>() {
+</span><span>    never_stops_compiling!()</span><span style="color:#eceff4;">;
+</span><span>}
+</span></code></pre>
+<p>One can then mentally figure out that expanding this call to <code>never_stops_compiling!</code> ends up indefinitely recursing. As a result, the recursion limit should be reached, and an error should be emitted. Let's check this out:</p>
+<pre style="background-color:#2e3440;color:#d8dee9;"><code><span>error: recursion limit reached while expanding `never_stops_compiling!`
+</span><span> --&gt; src/main.rs:3:9
+</span><span>  |
+</span><span>3 |         never_stops_compiling!()
+</span><span>  |         ^^^^^^^^^^^^^^^^^^^^^^^^
+</span><span>...
+</span><span>8 |     never_stops_compiling!();
+</span><span>  |     ------------------------ in this macro invocation
+</span><span>  |
+</span><span>  = help: consider increasing the recursion limit by adding a `#![recursion_limit = &quot;256&quot;]` attribute to your crate (`playground`)
+</span><span>  = note: this error originates in the macro `never_stops_compiling` (in Nightly builds, run with -Z macro-backtrace for more info)
+</span><span>
+</span><span>error: could not compile `playground` due to previous error
+</span></code></pre>
+<p>This means that the only way to make the compiler use <em>a lot</em> of memory using macros is to maximize the amount of work to perform at each recursion. This way, processing the macro call costs more and more resources to the host machine, making the compiler eventually hang.</p>
+<p>The most intuitive way to do this is to add a new token each time we recurse. Something like:</p>
+<pre data-lang="rust" style="background-color:#2e3440;color:#d8dee9;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#88c0d0;">macro_rules! </span><span>never_stops_compiling {
+</span><span>    ( </span><span style="color:#81a1c1;">$</span><span>( $input</span><span style="color:#eceff4;">:</span><span style="color:#81a1c1;">tt </span><span>)</span><span style="color:#81a1c1;">* </span><span>) </span><span style="color:#81a1c1;">=&gt; </span><span>{
+</span><span>        never_stops_compiling!( </span><span style="color:#81a1c1;">$</span><span>( $input )</span><span style="color:#81a1c1;">* | </span><span>)
+</span><span>    }</span><span style="color:#eceff4;">;
+</span><span>}
+</span></code></pre>
+<p>This means that calling <code>never_stops_compiling</code> with no argument will yield to calling <code>never_stops_compiling!(|)</code>, which will itself trigger a call to <code>never_stops_compiling!(||)</code>, expanding to <code>never_stops_compiling!(|||)</code>, and so on, and so forth, adding one <code>|</code> at each recursion. As a result, memory usage increases somewhat linearly at each recursion.</p>
+<p>As our goal is to eat all the available RAM, we need to create as many tokens as possible before recursing, so that memory usage increases so quickly that <code>rustc</code> gets OOM killed <em>before</em> the recursion limit is reached. To do so, we need to create a lot of tokens, very quickly.</p>
+<h1 id="exponential-growth">Exponential growth<a class="zola-anchor" href="#exponential-growth" aria-label="Anchor link for: exponential-growth"><i class="fas fa-link"></i></a> 
+</h1>
+<p><em>Disclaimer: this section briefly talks about Covid-19. Feel free to skip to the next section if necessary.</em></p>
+<p>This post is written in summer 2022. Covid-19 drastically changed our lives more than two years ago. I think everyone here heard at least once about exponential growth.</p>
+<p>When a value grows exponentially, this means that it is multiplied by some constant factor at each step. In epidemiology, we call this factor <em>R</em>. It can be interpreted as &quot;each person who catches Covid transmits it to <em>R</em> people&quot;. Our goal is to keep this value lower than 1.</p>
+<p>Exponential growth has a nice property. As long as we have <em>R &gt; 1</em>, it is guaranteed to eventually grow faster than any polynomial value. This makes exponential growth a strong candidate for our memory hog.</p>
+<h1 id="gimme-gimme-gimme-tokens">Gimme gimme gimme [tokens]<a class="zola-anchor" href="#gimme-gimme-gimme-tokens" aria-label="Anchor link for: gimme-gimme-gimme-tokens"><i class="fas fa-link"></i></a> 
+</h1>
+<p>Let's double the number of tokens passed at each invocation:</p>
+<pre data-lang="rust" style="background-color:#2e3440;color:#d8dee9;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#88c0d0;">macro_rules! </span><span>never_stops_compiling {
+</span><span>    ( </span><span style="color:#81a1c1;">$</span><span>( $input</span><span style="color:#eceff4;">:</span><span style="color:#81a1c1;">tt </span><span>)</span><span style="color:#81a1c1;">* </span><span>) </span><span style="color:#81a1c1;">=&gt; </span><span>{
+</span><span>        never_stops_compiling!(
+</span><span>            </span><span style="color:#81a1c1;">$</span><span>( $input )</span><span style="color:#81a1c1;">*
+</span><span>            </span><span style="color:#81a1c1;">$</span><span>( $input )</span><span style="color:#81a1c1;">*
+</span><span>        )
+</span><span>    }</span><span style="color:#eceff4;">;
+</span><span>}
+</span></code></pre>
+<p>We need to provide the initial <code>|</code> token so that it is actually repeated:</p>
+<pre data-lang="rust" style="background-color:#2e3440;color:#d8dee9;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#88c0d0;">macro_rules! </span><span>never_stops_compiling {
+</span><span>    () </span><span style="color:#81a1c1;">=&gt; </span><span>{
+</span><span>        never_stops_compiling!( | )
+</span><span>    }</span><span style="color:#eceff4;">;
+</span><span>
+</span><span>    ( </span><span style="color:#81a1c1;">$</span><span>( $input</span><span style="color:#eceff4;">:</span><span style="color:#81a1c1;">tt </span><span>)</span><span style="color:#81a1c1;">* </span><span>) </span><span style="color:#81a1c1;">=&gt; </span><span>{
+</span><span>        never_stops_compiling!(
+</span><span>            </span><span style="color:#81a1c1;">$</span><span>( $input )</span><span style="color:#81a1c1;">*
+</span><span>            </span><span style="color:#81a1c1;">$</span><span>( $input )</span><span style="color:#81a1c1;">*
+</span><span>        )
+</span><span>    }</span><span style="color:#eceff4;">;
+</span><span>}
+</span></code></pre>
+<p>This means that expanding <code>never_stops_compiling!()</code> will give us <code>never_stops_commpiling!(|)</code>, which expands to <code>never_stops_compiling(||)</code>, which expands to <code>never_stops_compiling(||||)</code>, doubling the number of <code>|</code> at each recursion. As a result, there are 1024 <code>|</code> for rustc to store in the 10th recursion (or 11th, depending on if you want to be off-by-one or not).</p>
+<p>In Rust, the default recursion limit is 128. This means that the last call of <code>never_stops_compiling!</code> would pass 2<sup>128</sup> (or 2<sup>127</sup>) tokens before hitting the recursion limit.</p>
+<p>Let's suppose we have an awesome compiler. It is running on bare metal, without any kernel that's consuming memory. There is no other process running in the background, all the memory is available. The compiler is so optimized that each token takes one byte of RAM.</p>
+<p>We would still need <em>*waves in the air*</em> about 2<sup>128</sup> bytes of memory before being able to emit the recursion limit error. That's roughly 10<sup>100</sup> GB of RAM. As a matter of fact, the laptop I'm writing this blogpost with has 16 GB of RAM and that's enough for most of my work (looking at you, <code>tremor-runtime</code>).</p>
+<p>Let's be honest. No developer on this planet has enough RAM on their computer to make this program fail to compile.</p>
+<p>Let's see it in action:</p>
+<span style="text-align:center">
+<p><img src="https://scrabsha.github.io/my-favorite-compiler-is-a-memory-hog/ram-usage.png" alt="If you can read this text, then there's a broken link. The image is a graph showing a huge memory increase over time" /></p>
+</span>
+<p>So yeah, that's a lot of RAM.</p>
+<h1 id="how-did-we-get-here"><a href="https://minecraft.fandom.com/wiki/How_did_we_get_here%3F_(block)">How did we get here?</a><a class="zola-anchor" href="#how-did-we-get-here" aria-label="Anchor link for: how-did-we-get-here"><i class="fas fa-link"></i></a> 
+</h1>
+<p>I have to confess something: I love declarative macros. Probably a bit too much. I love them so much that I often stay up very late at night, trying to write cursed macros which parses cursed things.</p>
+<p>I was writting a quite common TT muncher. It looked pretty much like:</p>
+<pre data-lang="rust" style="background-color:#2e3440;color:#d8dee9;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#88c0d0;">macro_rules! </span><span>i_am_a_tt_muncher {
+</span><span>    ( [ </span><span style="color:#81a1c1;">$</span><span>( $state</span><span style="color:#eceff4;">:</span><span style="color:#81a1c1;">tt </span><span>)</span><span style="color:#81a1c1;">*</span><span> ], let $var_name = </span><span style="color:#81a1c1;">$</span><span>( $tail</span><span style="color:#eceff4;">:</span><span style="color:#81a1c1;">tt </span><span>)</span><span style="color:#81a1c1;">* </span><span>) </span><span style="color:#81a1c1;">=&gt; </span><span>{
+</span><span>        </span><span style="color:#616e88;">// ... code to be written there ...
+</span><span>    }</span><span style="color:#eceff4;">;
+</span><span>
+</span><span>    </span><span style="color:#616e88;">/* Not shown: a lot of similar and unreadable match arms */
+</span><span>}
+</span></code></pre>
+<p>As I was a bit too tired, I wrote the following expansion code:</p>
+<pre data-lang="rust" style="background-color:#2e3440;color:#d8dee9;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#88c0d0;">macro_rules! </span><span>i_am_a_tt_muncher {
+</span><span>    ( [ </span><span style="color:#81a1c1;">$</span><span>( $state</span><span style="color:#eceff4;">:</span><span style="color:#81a1c1;">tt </span><span>)</span><span style="color:#81a1c1;">*</span><span> ], let $var_name = </span><span style="color:#81a1c1;">$</span><span>( $tail</span><span style="color:#eceff4;">:</span><span style="color:#81a1c1;">tt </span><span>)</span><span style="color:#81a1c1;">* </span><span>) </span><span style="color:#81a1c1;">=&gt; </span><span>{
+</span><span>        i_am_a_tt_muncher! {
+</span><span>            [ </span><span style="color:#616e88;">/* some new state */ </span><span>]</span><span style="color:#eceff4;">,
+</span><span>            </span><span style="color:#81a1c1;">let </span><span>$var_name </span><span style="color:#81a1c1;">= $</span><span>( $tail</span><span style="color:#eceff4;">:</span><span>tt )</span><span style="color:#81a1c1;">*
+</span><span>        }
+</span><span>    }</span><span style="color:#eceff4;">;
+</span><span>}
+</span></code></pre>
+<p>I was so tired that I rewrote the pattern and forgot two things:</p>
+<ul>
+<li>as we have processed the <code>let $var_name =</code>, we should not include it in the remaining input while recursing,</li>
+<li>we are expanding an additional <code>: tt</code> for each remaining token.</li>
+</ul>
+<p>As a result, each time we were matching that one rule, we started infinitely recursing, multiplying the number of tokens to process by three at each recursion.</p>
+<p>I saved the file, rust-analyzer triggered a <code>cargo check</code>, which triggered a macro expansion of a unit test, which triggered an infinite macro recursion, which quickly ate all my computer's RAM. Visual Studio Code started getting less and less responsive. One <code>killall rustc</code> later, my laptop came back to its original super beefy state. I had to reopen my crate with <code>vi</code> to diagnose and fix the problem.</p>
+<h1 id="final-thoughts">Final thoughts<a class="zola-anchor" href="#final-thoughts" aria-label="Anchor link for: final-thoughts"><i class="fas fa-link"></i></a> 
+</h1>
+<p>As they wanted to guarantee that declarative macros eventually stop expanding, the Rust designers added a recursion limit. This limit is great: if someone accidentally writes a macro that infinitely recurses, then the compilation halts and no CPU core gets indefinitely hurt in the process.</p>
+<p>However, this limit is not sufficient: while we are guaranteed that the compilation eventually finishes, we have no clue of how many resources are needed to actually get there.</p>
+<p>The only solution I can think of is to limit the number of tokens that can be passed to a macro. While it <em>technically</em> is a breaking change, this should not impact already-existing code if this limit is high enough.</p>
+
+    </section>
+    <footer>
+        <nav class="c-pagination p-pagination">
+            <div class="c-pagination__ctrl">
+                <div class="c-pagination__newer">
+                    
+                </div>
+                <div class="c-pagination__older">
+                    
+                </div>
+            </div>
+        </nav>
+    </footer>
+</article>
+        </main>
+
+     
+      <footer class="l-footer">
+          <p class="p-copyright">
+              
+              Written by Sasha Pourcelot, delivered under the <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY SA v4.0</a> license. Black Lives Matter.
+          </p>
+      </footer>
+
+       
+      <link rel="stylesheet" href="https://scrabsha.github.io/css/katex.min.css">
+      <script defer src="https://scrabsha.github.io/js/katex.min.js"></script>
+      <script defer src="https://scrabsha.github.io/js/mathtex-script-type.min.js"></script>
+
+      <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) ?
+                "dark" : "default"
+        });
+      </script>
+    </body>
+</html>
+            
