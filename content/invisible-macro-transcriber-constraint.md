@@ -1,5 +1,7 @@
 +++
-title = "The invisible macro transcriber constrain"
+title = "The invisible macro transcriber constraint"
+path = "invisible-macro-transcriber-constraint"
+aliases = ["invisible-macro-transcriber-constrain"]
 date = 2023-09-25
 +++
 
