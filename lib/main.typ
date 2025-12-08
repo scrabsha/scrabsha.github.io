@@ -1,5 +1,29 @@
+#let page-title-suffix = "S🦀sha's blog"
+#let page-title-separator = " | "
+
+#let title-ascii(title) = {
+  if title == none {
+    none
+  } else if type(title) == str {
+    title
+  } else if type(title) == array {
+    title.at(0)
+  }
+}
+
+#let title-content(title) = {
+  if title == none {
+    none
+  } else if type(title) == str {
+    [#title]
+  } else if type(title) == array {
+    title.at(1)
+  }
+}
+
 #let page(
-  title: "",
+  title: none,
+  date: none,
   body,
 ) = {
   html.html(
@@ -16,16 +40,30 @@
           href: "https://fonts.googleapis.com/css2?family=Libertinus+Serif:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&display=swap",
         )
 
-        if title != "" {
-          html.meta(title: title)
+        let title-ascii = title-ascii(title)
+        let title = if title-ascii == none {
+          page-title-suffix
+        } else {
+          title-ascii + page-title-separator + page-title-suffix
         }
+
+        html.title(title)
       })
-      
+
       set raw(theme: "../style/typst-gruvy-dark.tmTheme")
       html.body({
         html.header({
           include "header.typ"
         })
+        if title != none {
+          let title = title-content(title)
+          html.h1(title)
+        }
+        if date != none {
+          html.small[
+            Published on #date.display()
+          ]
+        }
         body
       })
     },
