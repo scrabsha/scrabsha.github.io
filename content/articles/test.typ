@@ -1,12 +1,17 @@
-#let name = "this is a test article"
+#let title = ("rustc as a hobby", [`rustc` as a hobby])
 #let published-date = datetime(year: 2025, month: 12, day: 8)
+#let description = [
+  This is a test article in which we test your browser's ability to meow.
+]
 
 #import "/lib/main.typ" as lib
 
 #show: lib.page.with(
-  title: ("rustc as a hobby", [`rustc` as a hobby]),
+  title: title,
   date: published-date
 )
+
+meow meow meow mrowww mrrrrrppp
 
 = owo
 
