@@ -1,3 +1,15 @@
+@font-face {
+  font-family: "Libertinus Serif";
+  src:
+    url("LibertinusSerif-Regular.woff2") format("woff");
+}
+
+@font-face {
+  font-family: "DejaVu Sans Mono";
+  src:
+    url("DejaVuSansMono.woff2") format("woff");
+}
+
 * {
   box-sizing: border-box;
 }

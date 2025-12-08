@@ -1,6 +1,7 @@
 # Input directories
 content_dir := content
 style_dir := style
+fonts_dir := fonts
 
 typst_version := v0.14.1
 typst := build/typst_$(typst_version)
@@ -14,8 +15,9 @@ index := $(articles_dir)/index.txt
 html_files := $(shell find $(content_dir) -name '*.typ' | sed 's|^$(content_dir)\(.*\)\.typ|$(target_dir)\1.html|')
 articles := $(shell find $(articles_dir) -name '*.typ')
 css_files := $(shell find $(style_dir) -name '*.css' | sed 's|^$(style_dir)|$(target_dir)|')
+font_files := $(shell find $(fonts_dir) -name '*.woff2' | sed 's|^$(fonts_dir)|$(target_dir)|')
 
-main: $(html_files) $(css_files)
+main: $(html_files) $(css_files) $(font_files)
 
 clean:
 	rm -rf $(target_dir) build
@@ -35,6 +37,10 @@ $(target_dir)/%.html: $(content_dir)/%.typ lib $(typst)
 $(target_dir)/%.css: $(style_dir)/%.css
 	cp $< $@
 
+$(target_dir)/%.woff2: $(fonts_dir)/%.woff2
+	mkdir -p $(shell dirname $@)
+	cp $< $@
+
 $(index): $(content_dir)/articles/*.typ
 	ls $(content_dir)/articles/*.typ \
 	| xargs -n1 basename \
@@ -48,3 +54,4 @@ $(typst):
 		typst-x86_64-unknown-linux-musl/typst \
 		--strip-components=1
 	mv build/typst $(typst)
+
