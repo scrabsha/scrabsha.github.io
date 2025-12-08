@@ -113,12 +113,12 @@ pre {
   word-wrap: break-word;
   overflow: auto;
   background-color: #32302f;
+  font-size: 1.4rem;
   color: #ffffff
 }
 
 code {
   line-height: 1.50;
-  font-size: 1.4rem;
   font-family: "DejaVu Sans Mono", sans-serif;
 }
 
