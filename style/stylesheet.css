@@ -169,6 +169,18 @@ img {
   height: auto;
 }
 
+.left-margin-note {
+  position: absolute;
+  right: calc(100% + 1rem);
+  color: #888888;
+  width: 30rem;
+  text-align: right;
+}
+
+.margin-note {
+  position: relative; display: block;
+}
+
 @media (prefers-color-scheme: dark) {
   html {
     background-color: #151515
@@ -181,3 +193,23 @@ img {
   pre {
   }
 }
+
+@media screen and (width <= 1200px) {
+  .left-margin-note {
+    position: inherit;
+    right: unset;
+    width: unset;
+    text-align: left;
+  }
+
+  .margin-note {
+    position: unset;
+    display: unset;
+  }
+
+  .margin-note::after {
+    content: " · ";
+    color: #888888;
+  }
+}
+

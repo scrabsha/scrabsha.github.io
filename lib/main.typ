@@ -1,6 +1,12 @@
 #let page-title-suffix = "S🦀sha's blog"
 #let page-title-separator = " | "
 
+#let paragraph-name(body) = {
+  html.span(class: "margin-note", {
+    html.span(class: "left-margin-note", body)
+  })
+}
+
 #let title-ascii(title) = {
   if title == none {
     none

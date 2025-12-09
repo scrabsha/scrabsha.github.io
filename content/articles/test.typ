@@ -8,10 +8,14 @@
 
 #show: lib.page.with(
   title: title,
-  date: published-date
+  date: published-date,
 )
 
-meow meow meow mrowww mrrrrrppp
+#lib.paragraph-name[Cat noises]
+meow meow meow mrowww mrrrrrppp merrrrrrroww meeurrow brrrrrrrrt muuuow
+
+#lib.paragraph-name[Latin stuff (boring)]
+#lorem(20)
 
 = owo
 
