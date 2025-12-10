@@ -1,4 +1,4 @@
-#import "meows.typ" : meows
+#import "meows.typ": meows
 
 #let page-title-suffix = "S🦀sha's blog"
 #let page-title-separator = " | "
@@ -41,6 +41,7 @@
         html.meta(charset: "utf-8")
         html.meta(name: "viewport", content: "width=device-width, initial-scale=1")
         html.link(rel: "stylesheet", href: "/stylesheet.css")
+        html.script(src: "/meows.js", defer: true)
         html.link(rel: "preconnect", href: "https://fonts.googleapis.com")
         html.link(rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "anonymous")
         html.link(
@@ -59,6 +60,7 @@
       })
 
       set raw(theme: "../style/typst-gruvy-dark.tmTheme")
+
       html.body({
         html.header({
           include "header.typ"
@@ -72,6 +74,10 @@
             Published on #date.display()
           ]
         }
+
+        show par: it => meows(it, density: 4)
+        show heading: it => meows(it, density: 8)
+
         body
       })
     },

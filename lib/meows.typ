@@ -11,10 +11,10 @@
 )
 
 #let meows(seed: datetime.today(), density: 2, body) = {
-  let nonrecursive-label = <meow-stop-recursion>
+  let nonrecursive-label = <no-meow>
 
   let nonrecursive(body) = [
-    #body <meow-stop-recursion>
+    #body #nonrecursive-label
   ]
 
   let should-insert-meow(rng) = {

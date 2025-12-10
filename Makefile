@@ -2,6 +2,7 @@
 content_dir := content
 style_dir := style
 fonts_dir := fonts
+js_dir := scripts
 
 typst_version := v0.14.1
 typst := build/typst_$(typst_version)
@@ -16,8 +17,9 @@ html_files := $(shell find $(content_dir) -name '*.typ' | sed 's|^$(content_dir)
 articles := $(shell find $(articles_dir) -name '*.typ')
 css_files := $(shell find $(style_dir) -name '*.css' | sed 's|^$(style_dir)|$(target_dir)|')
 font_files := $(shell find $(fonts_dir) -name '*.woff2' | sed 's|^$(fonts_dir)|$(target_dir)|')
+js_files := $(shell find $(js_dir) -name '*.js' | sed 's|^$(js_dir)|$(target_dir)|')
 
-main: $(html_files) $(css_files) $(font_files)
+main: $(html_files) $(css_files) $(font_files) $(js_files)
 
 clean:
 	rm -rf $(target_dir) build
@@ -38,6 +40,10 @@ $(target_dir)/%.css: $(style_dir)/%.css
 	cp $< $@
 
 $(target_dir)/%.woff2: $(fonts_dir)/%.woff2
+	mkdir -p $(shell dirname $@)
+	cp $< $@
+
+$(target_dir)/%.js: $(js_dir)/%.js
 	mkdir -p $(shell dirname $@)
 	cp $< $@
 
