@@ -1,3 +1,5 @@
+#import "meows.typ" : meows
+
 #let page-title-suffix = "S🦀sha's blog"
 #let page-title-separator = " | "
 

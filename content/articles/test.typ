@@ -17,6 +17,9 @@ meow meow meow mrowww mrrrrrppp merrrrrrroww meeurrow brrrrrrrrt muuuow
 #lib.paragraph-name[Latin stuff (boring)]
 #lorem(20)
 
+#lib.paragraph-name[Latin stuff (gay)]
+#lib.meows(lorem(20))
+
 = owo
 
 (presumably)
