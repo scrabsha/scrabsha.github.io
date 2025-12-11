@@ -17,10 +17,10 @@
 html {
   font-size: 70.0%;
   background-color: #fffff8;
+  color: #000000;
 }
 
 body {
-  color: #000000;
   font-size: 1rem;
   font-family: "Libertinus Serif", serif;
   width: 85%;
@@ -31,10 +31,6 @@ body {
 header > h1 {
   font-size: 5.2rem;
   margin-bottom: 0em;
-}
-
-header > p {
-  
 }
 
 header {
@@ -191,16 +187,15 @@ label {
 }
 
 @media (prefers-color-scheme: dark) {
-  html {
-    background-color: #151515
+  html:not(.theme-evaluated) {
+    background-color: #151515;
+    color: #ffffff;
   }
+}
 
-  body {
-    color: #ffffff
-  }
-
-  pre {
-  }
+.dark-theme {
+  background-color: #151515;
+  color: #ffffff
 }
 
 @media screen and (width <= 1200px) {
@@ -221,4 +216,3 @@ label {
     color: #888888;
   }
 }
-

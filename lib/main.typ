@@ -42,6 +42,7 @@
         html.meta(name: "viewport", content: "width=device-width, initial-scale=1")
         html.link(rel: "stylesheet", href: "/stylesheet.css")
         html.script(src: "/meows.js", defer: true)
+        html.script(src: "/theme.js", defer: true)
         html.link(rel: "preconnect", href: "https://fonts.googleapis.com")
         html.link(rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "anonymous")
         html.link(
