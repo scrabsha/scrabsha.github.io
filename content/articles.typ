@@ -19,7 +19,7 @@
 
     // TODO: this generate a lot of space between the title and the description
     // in the final html page. figure out how to avoid that.
-    heading(level: 2, link(article_path, title-content))
+    html.h3(link(article_path, title-content))
     article.description
   }
 }
