@@ -199,6 +199,16 @@ label {
   color: #ffffff
 }
 
+.dark-bw-theme {
+  background-color: #000000;
+  color: #ffffff
+}
+
+.light-bw-theme {
+  background-color: #ffffff;
+  color: #000000
+}
+
 @media screen and (width <= 1200px) {
   .left-margin-note {
     position: inherit;

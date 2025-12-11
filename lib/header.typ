@@ -15,11 +15,21 @@ Some thoughts about my computer science journey.
 
   #html.div[
     #html.input(type: "checkbox", id: "dark-theme-toggle")
-    // TODO: can't use `label(for: "cat-toggle")` because `for` is a keyword. It
-    // seems like there is no equivalent of `r#for` in typst :(
+    // TODO: can't use `label(for: "dark-theme-toggle")` because `for` is a
+    // keyword. It seems like there is no equivalent of `r#for` in typst :(
     //
     // We have to resort to this HORRIBLE solution.
     // https://github.com/typst/typst/issues/7480
     #html.label(..("for": "dark-theme-toggle"))[Dark theme 🌒]
+  ]
+
+  #html.div[
+    #html.input(type: "checkbox", id: "bw-toggle")
+    // TODO: can't use `label(for: "bw-toggle")` because `for` is a keyword. It
+    // seems like there is no equivalent of `r#for` in typst :(
+    //
+    // We have to resort to this HORRIBLE solution.
+    // https://github.com/typst/typst/issues/7480
+    #html.label(..("for": "bw-toggle"))[True black and white 🖨 ]
   ]
 ]
