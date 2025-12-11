@@ -17,7 +17,7 @@
 
   let should-insert-meow(rng) = {
     let a = ()
-    (rng, a) = integers(rng, high: density)
+    (rng, a) = integers(rng, high: density - 1)
     let a = a == 0
     (rng, a)
   }
