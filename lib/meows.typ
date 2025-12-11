@@ -7,15 +7,13 @@
   "nya",
   "meow",
   "miao",
-  "mrow"
+  "mrow",
 )
 
-#let meows(seed: datetime.today(), density: 2, body) = {
+#let meows(density: 2, body) = {
   let nonrecursive-label = <no-meow>
 
-  let nonrecursive(body) = [
-    #body #nonrecursive-label
-  ]
+  let nonrecursive(body) = [#body#nonrecursive-label]
 
   let should-insert-meow(rng) = {
     let a = ()
@@ -36,6 +34,16 @@
     body.has("label") and body.label == nonrecursive-label
   }
 
+  let hash(string) = {
+    // FNV-1A (32bits)
+    let state = 2166136261
+    for char in string {
+      state = calc.rem-euclid(state.bit-xor(char.to-unicode()) * 16777619, 4294967295)
+    }
+
+    state
+  }
+
   show text: it => {
     if is-already-processed(it) {
       return it
@@ -43,18 +51,34 @@
 
     let body = []
     let a = ()
-    let rng = gen-rng-f((seed.day()) * 366 + seed.month() * 31 + seed.year())
 
-    for word in it.text.split(" ") {
-      body += nonrecursive(word)
+    let seed_ = 2166136261
+    for char in it.text {
+      seed_ = calc.rem-euclid(seed_.bit-xor(char.to-unicode()) * 16777619, 4294967295)
+    }
+
+    let seed = hash(it.text)
+    let rng = gen-rng-f(seed)
+
+    let words = it.text.split(" ")
+
+    if words.len() >= 1 {
+      body += nonrecursive(words.at(0))
+    }
+
+    for idx in range(1, words.len()) {
+      let word = words.at(idx)
+      body += [ ]
 
       (rng, a) = should-insert-meow(rng)
-
       if a {
         let meow = ()
         (rng, meow) = random-meow(rng)
         body += nonrecursive(meow)
+        body += [ ]
       }
+
+      body += nonrecursive(word)
     }
 
     nonrecursive(body)
