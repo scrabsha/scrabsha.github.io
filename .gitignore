@@ -1,3 +1,4 @@
 content/articles/index.txt
 *.pdf
 build
+.env

@@ -29,6 +29,7 @@ $(target_dir)/articles.html: $(articles) $(index)
 
 $(target_dir)/%.html: $(content_dir)/%.typ lib $(typst)
 	mkdir -p $(shell dirname $@)
+	touch .env
 	$(typst) compile \
 	    --features html \
 	    --format html \

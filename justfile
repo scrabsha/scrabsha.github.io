@@ -8,4 +8,4 @@ serve: main
     python -m http.server --directory build/html
 
 watch:
-    watchexec --ignore build -- make
+    watchexec --ignore build --ignore .env -- make

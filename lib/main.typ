@@ -29,6 +29,11 @@
   }
 }
 
+#let env(key, default) = {
+  let env_ = toml("../.env")
+  env_.at(key, default: default)
+}
+
 #let page(
   title: none,
   date: none,
@@ -49,6 +54,10 @@
           rel: "stylesheet",
           href: "https://fonts.googleapis.com/css2?family=Libertinus+Serif:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&display=swap",
         )
+
+        if env("live-reload", false) {
+          html.script(src: "https://kalabasa.github.io/simple-live-reload/script.js")
+        }
 
         let title-ascii = title-ascii(title)
         let title = if title-ascii == none {
@@ -78,6 +87,7 @@
 
         show par: it => meows(it, density: 4)
         show heading: it => meows(it, density: 8)
+
 
         body
       })
