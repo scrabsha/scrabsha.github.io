@@ -7,6 +7,18 @@
   ]
 ]
 
+#let radio(id: none, name: none, content) = [
+  #html.div[
+    #html.input(type: "radio", name: name, id: id)
+    // TODO: can't use `label(for: "id")` because `for` is a keyword. It seems
+    // It seems like there is no equivalent of `r#for` in typst :(
+    //
+    // We have to resort to this HORRIBLE solution.
+    // https://github.com/typst/typst/issues/7480
+    #html.label(..("for": id), content)
+  ]
+]
+
 #let make(additional-header) = [
   #html.h1[S🦀sha's blog]
 
@@ -14,15 +26,10 @@
 
   #html.div(style: "display:flex;justify-content:center;align-items:center; flex-wrap: wrap")[
     #header-setting-element([Theme])[
-      #html.div[
-        #html.input(type: "checkbox", id: "dark-theme-toggle")
-        // TODO: can't use `label(for: "dark-theme-toggle")` because `for` is a
-        // keyword. It seems like there is no equivalent of `r#for` in typst :(
-        //
-        // We have to resort to this HORRIBLE solution.
-        // https://github.com/typst/typst/issues/7480
-        #html.label(..("for": "dark-theme-toggle"))[🌒 Dark mode]
-      ]
+      #radio(id: "dark-theme-radio", name: "theme")[🌒 Dark theme]
+      #radio(id: "system-theme-radio", name: "theme")[💻 System theme]
+      #radio(id: "light-theme-radio", name: "theme")[☀️ Light theme]
+
       #html.div[
         #html.input(type: "checkbox", id: "bw-toggle")
         // TODO: can't use `label(for: "bw-toggle")` because `for` is a keyword. It
