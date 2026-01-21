@@ -1,35 +1,50 @@
-#html.h1[S🦀sha's blog]
-
-Some thoughts about my computer science journey.
-
-#html.div(style: "position: centered")[
-  #html.div[
-    #html.input(type: "checkbox", id: "cat-toggle")
-    // TODO: can't use `label(for: "cat-toggle")` because `for` is a keyword. It
-    // seems like there is no equivalent of `r#for` in typst :(
-    //
-    // We have to resort to this HORRIBLE solution.
-    // https://github.com/typst/typst/issues/7480
-    #html.label(..("for": "cat-toggle"))[Cat mode 🐱]
+#let header-setting-element(legend, content) = [
+  #html.div(style: "min-width: max-content; text-align: center")[
+    #html.fieldset[
+      #html.legend(legend)
+      #html.div(style: "text-align: justify", content)
+    ]
   ]
+]
 
-  #html.div[
-    #html.input(type: "checkbox", id: "dark-theme-toggle")
-    // TODO: can't use `label(for: "dark-theme-toggle")` because `for` is a
-    // keyword. It seems like there is no equivalent of `r#for` in typst :(
-    //
-    // We have to resort to this HORRIBLE solution.
-    // https://github.com/typst/typst/issues/7480
-    #html.label(..("for": "dark-theme-toggle"))[Dark theme 🌒]
-  ]
+#let make(additional-header) = [
+  #html.h1[S🦀sha's blog]
 
-  #html.div[
-    #html.input(type: "checkbox", id: "bw-toggle")
-    // TODO: can't use `label(for: "bw-toggle")` because `for` is a keyword. It
-    // seems like there is no equivalent of `r#for` in typst :(
-    //
-    // We have to resort to this HORRIBLE solution.
-    // https://github.com/typst/typst/issues/7480
-    #html.label(..("for": "bw-toggle"))[True black and white 🖨 ]
+  Some thoughts about my computer science journey.
+
+  #html.div(style: "display:flex;justify-content:center;align-items:center; flex-wrap: wrap")[
+    #header-setting-element([Theme])[
+      #html.div[
+        #html.input(type: "checkbox", id: "dark-theme-toggle")
+        // TODO: can't use `label(for: "dark-theme-toggle")` because `for` is a
+        // keyword. It seems like there is no equivalent of `r#for` in typst :(
+        //
+        // We have to resort to this HORRIBLE solution.
+        // https://github.com/typst/typst/issues/7480
+        #html.label(..("for": "dark-theme-toggle"))[🌒 Dark mode]
+      ]
+      #html.div[
+        #html.input(type: "checkbox", id: "bw-toggle")
+        // TODO: can't use `label(for: "bw-toggle")` because `for` is a keyword. It
+        // seems like there is no equivalent of `r#for` in typst :(
+        //
+        // We have to resort to this HORRIBLE solution.
+        // https://github.com/typst/typst/issues/7480
+        #html.label(..("for": "bw-toggle"))[🖨 True B&W]
+      ]
+    ]
+    #additional-header
+    #html.div(style: "min-width: max-content")[
+      #html.fieldset(style: "margin: 5px")[
+        #html.legend[Personalization]
+        #html.div[
+          #html.input(type: "checkbox", id: "cat-toggle")
+          // TODO: can't use `label(for: "cat-toggle")` because `for` is a keyword. It
+          // seems like there is no equivalent of `r#for` in typst :(
+          //
+          // We have to resort to this HORRIBLE solution.
+          // https://github.com/typst/typst/issues/7480
+          #html.label(..("for": "cat-toggle"))[🐱 Cat mode]
+        ]]]
   ]
 ]

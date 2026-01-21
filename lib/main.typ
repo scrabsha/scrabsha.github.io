@@ -37,6 +37,7 @@
 #let page(
   title: none,
   date: none,
+  additional-header: none,
   body,
 ) = {
   html.html(
@@ -46,6 +47,7 @@
         html.meta(charset: "utf-8")
         html.meta(name: "viewport", content: "width=device-width, initial-scale=1")
         html.link(rel: "stylesheet", href: "/stylesheet.css")
+        html.script(src: "/food.js", defer: true)
         html.script(src: "/meows.js", defer: true)
         html.script(src: "/theme.js", defer: true)
         html.link(rel: "preconnect", href: "https://fonts.googleapis.com")
@@ -73,7 +75,8 @@
 
       html.body({
         html.header({
-          include "header.typ"
+          import "header.typ"
+          header.make(additional-header)
         })
         if title != none {
           let title = title-content(title)

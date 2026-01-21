@@ -101,6 +101,14 @@ ol {
 
 li {
   font-size: 1.6rem;
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.food-item-checkbox {
+  position: absolute;
+  right: calc(100% + 0.5rem);
+  text-align: right;
 }
 
 dt {
@@ -183,7 +191,7 @@ img {
   display: none;
 }
 
-label {
+div > label {
   font-size: 15px;
 }
 
