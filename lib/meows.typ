@@ -8,6 +8,9 @@
   "meow",
   "miao",
   "mrow",
+  "kekekeke", // cat chirping
+  "ma-ah", // Grisette's contribution, I can only assume that it means stop whatever the fuck you're doing and gove me attention 
+  "meeeeeeeee" // Harley's long meow (the o and w are silent in the Siamese accent) it has the same meaning as Grisette's "ma-ah"
 )
 
 #let meows(density: 2, body) = {
