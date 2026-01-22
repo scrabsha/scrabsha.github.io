@@ -54,23 +54,6 @@
   body
 }
 
-// #show list.item: it => context {
-//   let id = str(food-counter.get().first())
-//   food-counter.step()
-//   let id = "list-checkbox-" + id
-
-//   let checkbox-class = "food-item-checkbox"
-
-//   [
-//     #html.div(style: "position: relative; display: block")[
-//       #html.li(style: "list-style: none")[
-//         #html.input(type: "checkbox", style: "display: inline-block", class: checkbox-class, id: id, checked: false)
-//         #html.label(..("for": id))[#it.body]
-//       ]
-//     ]
-//   ]
-// }
-
 #let item(fr: none, it: none, nl: none, start, amount) = {
   html.span(class: "product-fr")[#start _#fr _ (#amount)]
   html.span(class: "product-it")[#start _#it _ (#amount)]
