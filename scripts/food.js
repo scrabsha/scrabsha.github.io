@@ -1,29 +1,25 @@
-const language_buttons = document.getElementsByName("product-names-language")
-const available_languages = Array.from(language_buttons).map(
-  (element) => element.value.split("-").at(-1)
-)
+let current_language = localStorage.getItem("products-language") || "fr"
+document.forms.page_settings.product_language.value = current_language
 
-function update_products(lang) {
-  for (const lang_ of available_languages) {
-    const display = (lang_ === lang) ? "inherit" : "none"
-    const elts = document.getElementsByClassName(`product-${lang_}`)
-    for (const elt of elts) {
-      elt.style.display = display
-    }
+function set_products_display(lang, dis) {
+  const elts = document.getElementsByClassName(`product-${lang}`)
+  for (const elt of elts) {
+    elt.style.display = dis
   }
 }
 
-for (const lang of available_languages) {
-  const radio_button = document.getElementById(`product-names-${lang}`)
-
-  if (radio_button.checked) {
-    update_products(lang)
-  }
-
-  radio_button.addEventListener("change", (e) => {
-    update_products(lang)
-  })
+function update_products() {
+  set_products_display(current_language, "none")
+  current_language = document.forms.page_settings.product_language.value
+  set_products_display(current_language, "inherit")
+  localStorage.setItem("products-language", current_language)
 }
+
+document.forms.page_settings.addEventListener("change", () => {
+  update_products()
+})
+
+update_products()
 
 function store_checkbox_status(elt) {
   const storage_item_name = `${location.href}-${elt.id}`
@@ -45,7 +41,7 @@ for (const food_button of food_buttons) {
   const checked = localStorage.getItem(storage_item_name)
   food_button.checked = checked === 'true'
 
-  food_button.addEventListener("click", (e) => {
+  food_button.addEventListener("click", () => {
     const checked = food_button.checked
     localStorage.setItem(storage_item_name, checked)
   })

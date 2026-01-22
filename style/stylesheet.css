@@ -214,7 +214,11 @@ div > label {
 
 .light-bw-theme {
   background-color: #ffffff;
-  color: #000000
+  color: #000000;
+}
+
+.product {
+  display: none;
 }
 
 @media screen and (width <= 1200px) {

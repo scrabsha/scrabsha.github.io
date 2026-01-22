@@ -55,9 +55,13 @@
 }
 
 #let item(fr: none, it: none, nl: none, start, amount) = {
-  html.span(class: "product-fr")[#start _#fr _ (#amount)]
-  html.span(class: "product-it")[#start _#it _ (#amount)]
-  html.span(class: "product-nl")[#start _#nl _ (#amount)]
+  [
+    #start
+    #html.span(class: "product product-fr")[_#fr _]
+    #html.span(class: "product product-it")[_#it _]
+    #html.span(class: "product product-nl")[_#nl _]
+    (#amount)
+  ]
 }
 
 #let t45-flour(amount) = {
@@ -74,15 +78,14 @@
 }
 
 #let header = [
-  #let localized-product-name-button(checked: false, language-name, shortcode) = [
+  #let localized-product-name-button(language-name, shortcode) = [
     #let input-id = "product-names-" + shortcode
     #html.div[
       #html.input(
         type: "radio",
-        name: "product-names-language",
-        value: input-id,
+        name: "product_language",
+        value: shortcode,
         id: input-id,
-        checked: checked,
       )
       #html.label(..("for": input-id), language-name)
     ]
@@ -90,7 +93,7 @@
   #html.div(style: "min-width: max-content")[
     #html.fieldset(style: "margin: 5px; text-align: left")[
       #html.legend[Ingredient language]
-      #localized-product-name-button(checked: true, [🇫🇷 French], "fr")
+      #localized-product-name-button([🇫🇷 French], "fr")
       #localized-product-name-button([🇮🇹 Italian], "it")
       #localized-product-name-button([🇳🇱 Dutch], "nl")
     ]
