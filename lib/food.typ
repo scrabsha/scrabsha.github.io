@@ -20,7 +20,7 @@
 
 #let title(string-name, content-name) = {
   let content-name = html.span(style: "display: flex; justify-content: space-between; align-items: center")[
-    #html.h1[#content-name]
+    #html.h1(style: "margin-top: 0px; margin-bottom: 0px")[#content-name]
     #html.div(id: "clear-food-checkboxes", style: "display: flex; align-items: center")[
       #html.a[Clear checkboxes] #[#fa-arrow-rotate-left]
     ]
