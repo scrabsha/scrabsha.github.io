@@ -21,28 +21,37 @@ document.forms.page_settings.addEventListener("change", () => {
 
 update_products()
 
-function store_checkbox_status(elt) {
-  const storage_item_name = `${location.href}-${elt.id}`
-  localStorage.setItem(storage_item_name, elt.checked === 'true')
+const checkbox_status_key = `${location.href}-recipe-checkboxes`
+
+function restore_checkbox_status() {
+  const checkboxes = JSON.parse(localStorage.getItem(checkbox_status_key))
+
+  try {
+    for (const checked_checkbox_id of checkboxes) {
+      try {
+        document.getElementById(checked_checkbox_id).checked = true
+      } catch (e) {}
+    }
+  } catch (e) {}
+}
+
+restore_checkbox_status()
+
+function store_checkbox_status() {
+  const checked_checkbox_ids = Array.from(document.getElementsByClassName("food-item-checkbox"))
+    .filter((checkbox) => checkbox.checked)
+    .map((checkbox) => checkbox.id)
+
+  let doc = JSON.stringify(checked_checkbox_ids)
+  localStorage.setItem(checkbox_status_key, doc)
 }
 
 const food_reset_button = document.getElementById("clear-food-checkboxes");
 food_reset_button.addEventListener("click", (e) => {
-  const checkboxes = document.getElementsByClassName("food-item-checkbox")
-  for (const checkbox of checkboxes) {
-    checkbox.checked = false
-    store_checkbox_status(checkbox)
-  }
+  document.forms.recipe.reset()
+  store_checkbox_status()
 })
 
-const food_buttons = document.getElementsByClassName("food-item-checkbox")
-for (const food_button of food_buttons) {
-  const storage_item_name = `${location.href}-${food_button.id}`
-  const checked = localStorage.getItem(storage_item_name)
-  food_button.checked = checked === 'true'
-
-  food_button.addEventListener("click", () => {
-    const checked = food_button.checked
-    localStorage.setItem(storage_item_name, checked)
-  })
-}
+document.forms.recipe.addEventListener("change", () => {
+  store_checkbox_status()
+})

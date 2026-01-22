@@ -1,7 +1,7 @@
-// Ported from fa-arrow-rotate-left by the font awesome 
-// 
+// Ported from fa-arrow-rotate-left by the font awesome
+//
 // https://fontawesome.com/icons/arrow-rotate-left?f=classic&s=solid
-// 
+//
 // Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.
 #let fa-arrow-rotate-left = html.elem(
   "svg",
@@ -44,14 +44,21 @@
     [
       #html.div(style: "position: relative; display: block")[
         #html.li(style: "list-style: none")[
-          #html.input(type: "checkbox", style: "display: inline-block", class: checkbox-class, id: id, checked: false)
+          #html.input(
+            type: "checkbox",
+            id: id,
+            class: checkbox-class,
+            name: id,
+            style: "display: inline-block",
+            checked: false,
+          )
           #html.label(..("for": id))[#meows.meows(density: 8, it.body)]
         ]
       ]
     ]
   }
 
-  body
+  html.form(name: "recipe", body)
 }
 
 #let item(fr: none, it: none, nl: none, start, amount) = {
