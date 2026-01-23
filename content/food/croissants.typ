@@ -27,7 +27,7 @@ Definitely not French-boulangerie-grade, but certainly good enough for when I'm 
 - In a bowl, mix the flour, the salt and the sugar
 - Make a well in the mix, then slowly incorporate the milk
 - Once the milk is fully incorporated, add the yeast
-- Kneed for 15 minutes
+- Knead for 15 minutes
 - Let it rest for two hours in a covered bowl
 - Spread the dough as thin as possible
 - Spread the butter on a corner
