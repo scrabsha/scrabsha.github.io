@@ -29,9 +29,42 @@
   (string-name, content-name)
 }
 
-#let page(body) = {
-  let food-counter = counter("list-item-id")
+#let food-counter = counter("list-item-id")
 
+#let timer-item(h: 0, m: 0, s: 0, body) = context {
+  let duration = (h * 60 + m) * 60 + s
+
+  let checkbox-id = str(food-counter.get().first())
+  let checkbox-id = "list-checkbox-" + checkbox-id
+  let progress-id = checkbox-id + "-progress"
+
+  let button = html.elem(
+    "a",
+    attrs: (
+      // TODO: rename food-timer-start
+      "class": "food-timer",
+      "food_timer_duration": str(duration),
+      "food_timer_progress": progress-id,
+      "checkbox_id": checkbox-id,
+    )
+  )[set timer]
+
+  let progress-id = checkbox-id + "-progress"
+
+  let progress = html.a(
+    id: progress-id,
+    style: "display: none"
+  )[
+    // Filled by the javascript
+  ]
+
+  [
+    - #body (#button#progress)
+  ]
+}
+
+
+#let page(body) = {
   import "meows.typ" as meows
 
   show list.item: it => context {
