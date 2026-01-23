@@ -2,7 +2,7 @@ let current_language = localStorage.getItem("products-language") || "fr"
 document.forms.page_settings.product_language.value = current_language
 
 function set_products_display(lang, dis) {
-  const elts = document.getElementsByClassName(`product-${lang}`)
+  const elts = document.getElementsByClassName(lang)
   for (const elt of elts) {
     elt.style.display = dis
   }

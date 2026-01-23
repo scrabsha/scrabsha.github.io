@@ -97,9 +97,9 @@
 #let item(fr: none, it: none, nl: none, start, amount) = {
   [
     #start
-    #html.span(class: "product product-fr")[_#fr _]
-    #html.span(class: "product product-it")[_#it _]
-    #html.span(class: "product product-nl")[_#nl _]
+    #html.span(class: "product fr")[_#fr _]
+    #html.span(class: "product it")[_#it _]
+    #html.span(class: "product nl")[_#nl _]
     (#amount)
   ]
 }
