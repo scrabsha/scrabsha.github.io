@@ -20,9 +20,9 @@ No remoteworkster should ever have no ragù in their fridge. Let's fix that.
   nl: [gehakt],
 )
 
-- Half an onion (about 40 g)
-- Celery (about 40 g)
-- Half a carrot (about 40 g)
+- Half an onion (about 60 g)
+- Celery (about 60 g)
+- Half a carrot (about 60 g)
 - Olive oil (about 80 g)
 - #meat
 - Tomato sauce _Mutti passata_ (1400 g)
