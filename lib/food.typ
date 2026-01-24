@@ -67,7 +67,7 @@
   ]
 
   [
-    - #body (#button#progress)
+    - #body #html.span(class: "food-timer-container")[(#button#progress)]
   ]
 }
 

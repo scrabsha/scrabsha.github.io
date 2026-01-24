@@ -74,12 +74,14 @@ function timer_end(timer, interval) {
   checkbox.checked = true
 }
 
-function update_progress(progress, remaining) {
+function update_progress(progress, end_date) {
+  const current_date = Date.now()
+  let remaining = (end_date - current_date) / 1000 - 1
   const h = Math.floor(remaining / 3600)
   remaining -= h * 3600
   const m = Math.floor(remaining / 60)
   remaining = remaining - m * 60
-  const s = remaining
+  const s = Math.round(remaining)
 
   function f(v) {
     return String(v).padStart(2, "0")
@@ -110,14 +112,12 @@ async function run_timer(timer) {
   const progress = document.getElementById(timer.attributes.food_timer_progress.value)
   progress.style.display = "inherit"
 
-  let remaining = duration
+  const end_date = Date.now() + duration * 1000
 
-  remaining--
-  update_progress(progress, remaining)
+  update_progress(progress, end_date)
   const interval = setInterval(
     () => {
-      remaining--
-      update_progress(progress, remaining)
+      update_progress(progress, end_date)
     },
     1000
   )
@@ -141,9 +141,14 @@ function setup_timer(timer) {
   })
 }
 
-const timers = document.getElementsByClassName("food-timer")
-for (const timer of timers) {
-  setup_timer(timer)
+if (!/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+  const timers = document.getElementsByClassName("food-timer")
+  for (const timer of timers) {
+    setup_timer(timer)
+  }
+} else {
+  Array.from(document.getElementsByClassName("food-timer-container"))
+    .forEach((elt) => elt.style.display = "none")
 }
 
 function scale_weight(weight, ratio) {
