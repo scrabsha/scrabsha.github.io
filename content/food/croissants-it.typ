@@ -1,6 +1,8 @@
 #import "/lib/main.typ" as lib
 #import "/lib/food.typ" as food
 
+#import food: scaled
+
 #show: lib.page.with(
   title: food.title("Croissants", [Croissants]),
 )
@@ -9,14 +11,16 @@
 
 = Ingredients
 
-- Farina 00 (500 g)
-- Burro (180 g)
-- Lievito di birra fresco (25 g)
-- Zucchero (50 g)
-- Sale (10 g)
-- Late parzialmente scremato (28 cL)
-- Acqua (due cucchiai)
-- Uova (1)
+Per fare #food.base-amount-scale(1000) g di impasto:
+
+- Farina 00 (#scaled(500) g)
+- Burro (#scaled(180) g)
+- Lievito di birra fresco (#scaled(25) g)
+- Zucchero (#scaled(50) g)
+- Sale (#scaled(10) g)
+- Late parzialmente scremato (#scaled(28) cL)
+- Acqua (#scaled(2) cucchiai)
+- Uova (#scaled(1))
 
 = Steps
 
@@ -28,7 +32,7 @@
 - Lasciare il burro dietro dal frigorifero (deve iniziare a sciogliersi)
 - Lasciare riposare per due ore
 - Stendere l'impasto il più possibile, cercare di fare un rettangolo
-- Spalmare il burro su un quarto
+- Spalmare il burro su un quarto dell'impasto
 - Piegare in quatro
 - Piegare il risultato in modo che la faccia che ha tre strati di impasto si ritrovi fuori dall'impasto
 - Spalmare lentamente, cercando di non rompere l'impasto (il burro non deve essere visibile)

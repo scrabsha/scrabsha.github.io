@@ -1,6 +1,8 @@
 #import "/lib/main.typ" as lib
 #import "/lib/food.typ" as food
 
+#import food: scaled
+
 #show: lib.page.with(
   title: food.title("Ragù", [Ragù]),
   additional-header: food.header,
@@ -14,23 +16,25 @@ No remoteworkster should ever have no ragù in their fridge. Let's fix that.
 
 #let meat = food.item(
   [Minced beef, optionally with some pork],
-  [about 800 g],
+  [about #scaled(1000) g],
   fr: [bœuf haché],
   it: [macinato, metà manzo metà maiale],
   nl: [gehakt],
 )
 
-- Half an onion (about 60 g)
-- Celery (about 60 g)
-- Half a carrot (about 60 g)
-- Olive oil (about 80 g)
+For #food.base-amount-scale(1000) g of meat:
+
+- Half an onion (about #scaled(60) g)
+- Celery (about #scaled(60) g)
+- Half a carrot (about #scaled(60) g)
+- Olive oil (about #scaled(140) g)
 - #meat
-- Tomato sauce _Mutti passata_ (1400 g)
+- Tomato sauce _Mutti passata_ (#scaled(1600) g)
 - Water
 - #[
-  #html.span(class: "product fr")[Chocolate (about 4 squares)]
-  #html.span(class: "product it nl", style: "visibility: hidden")[-]
-]
+    #html.span(class: "product fr")[Chocolate (about 4 squares)]
+    #html.span(class: "product it nl", style: "visibility: hidden")[-]
+  ]
 - Salt
 
 = Steps

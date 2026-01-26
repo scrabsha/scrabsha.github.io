@@ -29,6 +29,14 @@
   (string-name, content-name)
 }
 
+#let base-amount-scale(amount) = [
+  _#html.elem("span", attrs: (id: "base-amount-scale", scaled_value: str(amount), contenteditable: "true"))[#amount]_
+]
+
+#let scaled(amount) = {
+  html.elem("span", attrs: (class: "scaled-weight", scaled_value: str(amount)))[#amount]
+}
+
 #let food-counter = counter("list-item-id")
 
 #let timer-item(h: 0, m: 0, s: 0, body) = context {

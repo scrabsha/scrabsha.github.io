@@ -145,3 +145,30 @@ const timers = document.getElementsByClassName("food-timer")
 for (const timer of timers) {
   setup_timer(timer)
 }
+
+function scale_weight(weight, ratio) {
+  const initial_weight_value = Number(weight.attributes.scaled_value.value)
+  const new_weight_value = Math.round(initial_weight_value * ratio)
+  // Avoid displaying `- Egg (0)` in the recipe.
+  const new_weight = String(new_weight_value === 0 ? 1 : new_weight_value)
+  weight.innerHTML = new_weight
+}
+
+function ajust_scaled_amounts(scale) {
+  const initial_scale_value = Number(scale.attributes.scaled_value.value)
+  const current_scale_value = parseInt(scale.innerHTML, 10)
+  const elts = Array.from(document.getElementsByClassName("scaled-weight"))
+
+  if (scale.innerHTML.match(/^[0-9]+$/) && !Number.isNaN(current_scale_value)) {
+    const ratio = current_scale_value / initial_scale_value
+    elts.forEach((weight) => scale_weight(weight, ratio))
+  } else {
+    elts.forEach((weight) => weight.innerHTML = "😾")
+  }
+
+}
+
+const base_amount_scale = document.getElementById("base-amount-scale")
+if (base_amount_scale !== null) {
+  base_amount_scale.addEventListener("input", () => ajust_scaled_amounts(base_amount_scale))
+}
