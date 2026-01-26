@@ -159,7 +159,11 @@ function ajust_scaled_amounts(scale) {
   const current_scale_value = parseInt(scale.innerHTML, 10)
   const elts = Array.from(document.getElementsByClassName("scaled-weight"))
 
-  if (scale.innerHTML.match(/^[0-9]+$/) && !Number.isNaN(current_scale_value)) {
+  if (
+    scale.innerHTML.match(/^[0-9]+$/)
+    && !Number.isNaN(current_scale_value)
+    && current_scale_value !== 0
+  ) {
     const ratio = current_scale_value / initial_scale_value
     elts.forEach((weight) => scale_weight(weight, ratio))
   } else {
