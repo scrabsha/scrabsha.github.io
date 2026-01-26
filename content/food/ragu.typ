@@ -61,4 +61,4 @@ Ikea KORKEN 0.5 L rocks! Half a KORKEN is a 2 people meal.
 
 The goal is to add enough water in the pot such that the volume of ragù + water you have after three hours of boiling is the same as the volume of ragù you had at the beginning. It all depends on how much you can reduce the power.
 
-From my experience, gas stove requires one cup of water wherease vitro ceramic requires almost none.
+From my experience, gas stove requires one cup of water whereas vitro ceramic requires almost none.
