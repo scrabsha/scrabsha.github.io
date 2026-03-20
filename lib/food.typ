@@ -54,14 +54,14 @@
       "food_timer_duration": str(duration),
       "food_timer_progress": progress-id,
       "checkbox_id": checkbox-id,
-    )
+    ),
   )[set timer]
 
   let progress-id = checkbox-id + "-progress"
 
   let progress = html.a(
     id: progress-id,
-    style: "display: none"
+    style: "display: none",
   )[
     // Filled by the javascript
   ]
@@ -123,6 +123,26 @@
 
 #let milk(amount) = {
   item(fr: [lait demi-écrémé], it: [latte parzialmente scremato], nl: [halfvolle melk], [Milk], amount)
+}
+
+#let sugar(amount) = {
+  item(
+    fr: [sucre],
+    it: [zucchero],
+    nl: [suiker],
+    [Sugar],
+    amount,
+  )
+}
+
+#let baking-powder(amount) = {
+  item(
+    fr: [levure chimique],
+    it: [lievito per dolci],
+    nl: [bakpoeder],
+    [Baking powder],
+    amount,
+  )
 }
 
 #let header = [

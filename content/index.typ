@@ -8,3 +8,4 @@ well u can also look at all the articles #link("articles.html")[here :3]
 
 - #link("/food/croissants.html")[Croissants]
 - #link("/food/ragu.html")[Ragù]
+- #link("/food/yogurt-cake.html")[Yogurt cake]
