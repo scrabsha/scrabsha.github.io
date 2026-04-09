@@ -11,15 +11,24 @@
 #{
   let content = read("articles/index.txt")
 
-  for article in content.split() {
-    let article_path = "articles/" + article
-    import article_path as article
+  let articles = content
+    .split()
+    .map(article => {
+      let path = "articles/" + article
+      import path as article
+      (path, article)
+    })
+    .sorted(key: article => article.at(1).published-date)
+    .rev()
 
-    let title-content = lib.title-content(article.title)
+  for article in articles {
+    let path = article.at(0)
+    let mod = article.at(1)
+    let title-content = lib.title-content(mod.title)
 
     // TODO: this generate a lot of space between the title and the description
     // in the final html page. figure out how to avoid that.
-    html.h3(link(article_path, title-content))
-    article.description
+    html.h3(link(path, title-content))
+    dictionary(mod).at("description", default: [])
   }
 }

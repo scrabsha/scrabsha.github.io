@@ -1,7 +1,6 @@
 // TODO: aliases
 #let title = "The invisible macro transcriber constraint"
 #let published-date = datetime(year: 2023, month: 09, day: 25)
-#let description = lorem(50)
 
 #import "../../lib/main.typ" as lib
 #show: lib.page.with(title: title, date: published-date)
