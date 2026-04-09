@@ -14,6 +14,10 @@
 )
 
 #let meows(density: 2, body) = {
+  if density == 0 {
+    return body
+  }
+
   let nonrecursive-label = <no-meow>
 
   let nonrecursive(body) = [#body#nonrecursive-label]
@@ -29,7 +33,7 @@
     let meow-idx = none
     (rng, meow-idx) = integers(rng, high: all-meows.len())
     let meow = all-meows.at(meow-idx)
-    let meow = html.span(class: "meow", nonrecursive(meow))
+    let meow = html.span(class: "meow", nonrecursive(meow + " "))
     (rng, meow)
   }
 
@@ -78,7 +82,6 @@
         let meow = ()
         (rng, meow) = random-meow(rng)
         body += nonrecursive(meow)
-        body += [ ]
       }
 
       body += nonrecursive(word)

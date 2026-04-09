@@ -141,6 +141,13 @@ code {
     font-size: 0.8em;
 }
 
+.term-display {
+    background-color: #32302f;
+    color: #ffffff;
+    border-radius: 3px;
+    padding: 4px;
+}
+
 table {
     border-collapse: collapse;
     border-spacing: 0;
