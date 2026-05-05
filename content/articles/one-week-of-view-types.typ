@@ -1,5 +1,5 @@
 #let title = ("One week of view_types", [One week of `view_types`])
-#let published-date = datetime(year: 2026, month: 5, day: 3)
+#let published-date = datetime(year: 2026, month: 5, day: 5)
 
 #import "../../lib/main.typ" as lib
 #show: lib.page.with(title: title, date: published-date)
