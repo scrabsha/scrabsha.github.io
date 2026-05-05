@@ -88,8 +88,8 @@
           ]
         }
 
-        // show par: it => meows(it, density: 8)
-        // show heading: it => meows(it, density: 32)
+        show par: it => meows(it, density: 8)
+        show heading: it => meows(it, density: 32)
 
         body
       })

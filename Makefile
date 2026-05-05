@@ -16,7 +16,7 @@ index := $(articles_dir)/index.txt
 html_files := $(shell find $(content_dir) -name '*.typ' | sed 's|^$(content_dir)\(.*\)\.typ|$(target_dir)\1.html|')
 articles := $(shell find $(articles_dir) -name '*.typ')
 css_files := $(shell find $(style_dir) -name '*.css' | sed 's|^$(style_dir)|$(target_dir)|')
-font_files := $(shell find $(fonts_dir) -name '*.woff2' | sed 's|^$(fonts_dir)|$(target_dir)|')
+font_files := $(shell find $(fonts_dir) \( -name '*.woff2' -o -name '*.ttf' \) | sed 's|^$(fonts_dir)|$(target_dir)|')
 js_files := $(shell find $(js_dir) -name '*.js' | sed 's|^$(js_dir)|$(target_dir)|')
 
 main: $(html_files) $(css_files) $(font_files) $(js_files)
@@ -41,6 +41,10 @@ $(target_dir)/%.css: $(style_dir)/%.css
 	cp $< $@
 
 $(target_dir)/%.woff2: $(fonts_dir)/%.woff2
+	mkdir -p $(shell dirname $@)
+	cp $< $@
+
+$(target_dir)/%.ttf: $(fonts_dir)/%.ttf
 	mkdir -p $(shell dirname $@)
 	cp $< $@
 
