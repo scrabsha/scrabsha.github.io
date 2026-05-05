@@ -18,7 +18,7 @@ Well. Thinking about `view_types` for more than an hour per day every day is a g
 
 This post is a bit half-baked. I could write about `view_types` for hours at this point, but right now my focus is to jot down everything I thought about in the past days. Maybe we'll be able to see how my views (🥁) change over time.
 
-#lib.paragraph-name[View types for `&T`] Something I did not consider at first is that expressing both immutable and mutable borrows dould be useful. For instance:
+#lib.paragraph-name[View types for `&T`] Something I did not consider at first is that expressing both immutable and mutable borrows could be useful. For instance:
 
 
 ```rust
@@ -45,7 +45,7 @@ fn main() {
 
 In this example, it is perfectly fine to call `Foo::show_bar` because the set of fields it needs to view `{ bar }` is disjoint.
 
-We could even allow things like `&mut self.{ foo, mut bar }` for "this function may view _immutably_ the field `foo` and _mutably_ the field `bar`". I am not sure whether we should have a `mut` right after the `&`, I'm ont sure I care.
+We could even allow things like `&mut self.{ foo, mut bar }` for "this function may view _immutably_ the field `foo` and _mutably_ the field `bar`". I am not sure whether we should have a `mut` right after the `&`, I'm not sure I care.
 
 #lib.paragraph-name[View types for `T`] Supporting views for `T` _in addition_ to `&T` would allow us to pass partially initialized data to functions, and have a type-checked builder pattern that does not require generic type parameters to keep track of its state:
 
