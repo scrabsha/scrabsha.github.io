@@ -88,6 +88,6 @@ I am using `..fields` here because I feel like this concept is actually close to
 
 #lib.paragraph-name[Is the syntax _really_ ugly?] Something I wrote down quite early in my notes is: "I hope the syntax will be changed to something less horrible". After a week, I am fully used to it. I even think it is fine?
 
-I do remember feeling the exact same thing about `let_else` the first time I encountered it: why would one use this monstruosity that I keep parsing as an `if` `else`? I was sad and disappointed. For months. Then I got involved in `rustc`'s attribute refactor (#rust-lang-ref(13329)), and started reading dozens of `let_else` every day. Now I cannot refrain from using use `let_else`. Everywhere. And I do get frowny when I can't use it in other languages.
+I do remember feeling the exact same thing about `let_else` the first time I encountered it: why would one use this monstruosity that I keep parsing as an `if` `else`? I was sad and disappointed. For months. Then I got involved in `rustc`'s attribute refactor (#rust-lang-ref(131229)), and started reading dozens of `let_else` every day. Now I cannot refrain from using use `let_else`. Everywhere. And I do get frowny when I can't use it in other languages.
 
 Maybe it's just a _me thing_, but I think `.{ foo, bar }` is fine, really.
