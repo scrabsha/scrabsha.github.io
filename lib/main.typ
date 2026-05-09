@@ -3,9 +3,33 @@
 #let page-title-suffix = "S🦀sha's blog"
 #let page-title-separator = " | "
 
+#let slug(body) = {
+  let slug-inner(body) = {
+    if body.has("children") {
+      let buf = ""
+      for child in body.children {
+        child = slug(child)
+        if child.len() != 0 {
+          buf = buf + child + "-"
+        }
+      }
+      buf
+    } else if body.has("text") {
+      body.text
+    } else {
+      ""
+    }
+  }
+
+  let protoslug = slug-inner(body)
+  protoslug = lower(protoslug)
+  protoslug.replace(regex("[^a-z]"), "-").replace(regex("-+"), "-").trim("-", at: alignment.end)
+}
+
 #let paragraph-name(body) = {
   html.span(class: "margin-note", {
-    html.span(class: "left-margin-note", body)
+    let id = slug(body)
+    html.a(class: "left-margin-note", href: "#" + id, id: id, body)
   })
 }
 

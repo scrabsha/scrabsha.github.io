@@ -1,7 +1,7 @@
 @font-face {
-    font-family: "Libertinus Serif";
-    src:
-        url("LibertinusSerif-Regular.woff2") format("woff");
+  font-family: "Libertinus Serif";
+  src:
+    url("LibertinusSerif-Regular.woff2") format("woff");
 }
 
 @font-face {
@@ -11,37 +11,76 @@
 }
 
 @font-face {
-    font-family: "DejaVu Sans Mono";
-    src:
-        url("DejaVuSansMono.woff2") format("woff");
+  font-family: "DejaVu Sans Mono";
+  src:
+    url("DejaVuSansMono.woff2") format("woff");
+}
+
+:root {
+  --primary-color: #000000;
+  --background-color: #fffff8;
+
+  --link-color: #496fcc;
+  --margin-note-color: #444444;
+
+  --code-background-color: #32302f;
+  --code-color: #ffffff;
+}
+
+.dark-theme,
+.dark-bw-theme {
+  --link-color: #4EA5D9;
+  --margin-note-color: #aaaaaa;
+}
+
+.dark-theme {
+  --background-color: #151515;
+  --primary-color: #ffffff
+}
+
+.dark-bw-theme {
+  --background-color: #000000;
+  --primary-color: #ffffff
+}
+
+.light-bw-theme {
+  --background-color: #ffffff;
+  --primary-color: #000000;
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not(.theme-evaluated) {
+    --background-color: #151515;
+    --primary-color: #ffffff;
+  }
 }
 
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 html {
-    font-size: 70.0%;
-    background-color: #fffff8;
-    color: #000000;
+  font-size: 70.0%;
+  background-color: var(--background-color);
+  color: var(--primary-color);
 }
 
 body {
-    font-size: 1rem;
-    font-family: "Libertinus Serif", serif;
-    width: 85%;
-    max-width: 720px;
-    margin: 0 auto 0;
+  font-size: 1rem;
+  font-family: "Libertinus Serif", serif;
+  width: 85%;
+  max-width: 720px;
+  margin: 0 auto 0;
 }
 
 header>h1 {
-    font-size: 5.2rem;
-    margin-bottom: 0em;
+  font-size: 5.2rem;
+  margin-bottom: 0em;
 }
 
 header {
-    margin-bottom: 1em;
-    text-align: center;
+  margin-bottom: 1em;
+  text-align: center;
 }
 
 h1,
@@ -50,217 +89,167 @@ h3,
 h4,
 h5,
 h6 {
-    font-weight: 300;
-    margin-bottom: 0.5em;
+  font-weight: 300;
+  margin-bottom: 0.5em;
 }
 
 h1 {
-    font-size: 3.2rem;
+  font-size: 3.2rem;
 }
 
 h2 {
-    font-size: 2.8rem;
+  font-size: 2.8rem;
 }
 
 h3 {
-    font-size: 2.4rem;
+  font-size: 2.4rem;
 }
 
 h4 {
-    font-size: 2rem;
+  font-size: 2rem;
 }
 
 h5 {
-    font-size: 1.8rem;
+  font-size: 1.8rem;
 }
 
 h6 {
-    font-size: 1.6rem;
+  font-size: 1.6rem;
 }
 
 p {
-    font-size: 1.6rem;
-    line-height: 1.55em;
+  font-size: 1.6rem;
+  line-height: 1.55em;
 }
 
 summary {
-    font-size: 1.6rem;
-    font-weight: bold;
+  font-size: 1.6rem;
+  font-weight: bold;
 }
 
 a {
-    color: #496fcc;
-    text-decoration: underline;
+  color: var(--link-color);
+  text-decoration: underline;
 }
 
-.dark-theme, .dark-bw-theme {
-    & a {
-        color: #4EA5D9;
-    }
-
-    & .margin-note {
-        color: #aaaaaa;
-    }
+.margin-note {
+  & a {
+    color: var(--margin-note-color);
+    text-decoration: none;
+  }
 }
-
 
 ul {
-    & li {
-        list-style: disc;
-    }
+  & li {
+    list-style: disc;
+  }
 }
 
 ol {
-    & li {
-        list-style: decimal;
-    }
+  & li {
+    list-style: decimal;
+  }
 }
 
 li {
-    font-size: 1.6rem;
-    margin-top: 8px;
-    margin-bottom: 8px;
-    line-height: 1.55em;
+  font-size: 1.6rem;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  line-height: 1.55em;
 }
 
 .food-item-checkbox {
-    position: absolute;
-    right: calc(100% + 0.5rem);
-    text-align: right;
+  position: absolute;
+  right: calc(100% + 0.5rem);
+  text-align: right;
 }
 
 dt {
-    margin-top: 16px;
-    font-size: 1.6rem;
+  margin-top: 16px;
+  font-size: 1.6rem;
 }
 
 dd {
-    margin: 8px 0 0 20px;
-    font-size: 1.6rem;
+  margin: 8px 0 0 20px;
+  font-size: 1.6rem;
 }
 
 
 pre {
-    display: block;
-    padding: 12px;
-    border-radius: 4px;
-    font-size: 17.5px;
-    word-wrap: break-word;
-    overflow: auto;
-    background-color: #32302f;
-    color: #ffffff
+  display: block;
+  padding: 12px;
+  border-radius: 4px;
+  font-size: 17.5px;
+  word-wrap: break-word;
+  overflow: auto;
+  background-color: var(--code-background-color);
+  color: var(--code-color)
 }
 
 code {
-    line-height: 1.50;
-    font-family: "Maple Mono Medium", "DejaVu Sans Mono", sans-serif;
-    font-size: 0.8em;
+  line-height: 1.50;
+  font-family: "Maple Mono Medium", "DejaVu Sans Mono", sans-serif;
+  font-size: 0.8em;
 }
 
 .term-display {
-    background-color: #32302f;
-    color: #ffffff;
-    border-radius: 3px;
-    padding: 4px;
+  background-color: var(--code-background-color);
+  color: var(--code-color);
+  border-radius: 3px;
+  padding: 4px;
 }
 
 table {
-    border-collapse: collapse;
-    border-spacing: 0;
-    font-size: 1.6rem;
-}
-
-th,
-td {
-    padding: 8px;
-    border: 1px solid #eee;
-}
-
-th {
-    background-color: #fafafa;
-    font-weight: normal;
-}
-
-del {
-    color: #999;
-}
-
-blockquote {
-    margin: 0;
-    padding: 8px 12px;
-    border-left: 3px solid #ccc;
-
-    & * {
-        margin: 0;
-    }
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-size: 1.6rem;
 }
 
 img {
-    max-width: 100%;
-    height: auto;
+  max-width: 100%;
+  height: auto;
 }
 
 .left-margin-note {
-    position: absolute;
-    right: calc(100% + 1rem);
-    width: 30rem;
-    text-align: right;
+  position: absolute;
+  right: calc(100% + 1rem);
+  width: 30rem;
+  text-align: right;
 }
 
 .margin-note {
-    position: relative;
-    display: block;
-    color: #444444;
+  position: relative;
+  display: block;
+  color: var(--margin-note-color);
 }
 
 .meow {
-    display: none;
+  display: none;
 }
 
 div>label {
-    font-size: 15px;
-}
-
-@media (prefers-color-scheme: dark) {
-    html:not(.theme-evaluated) {
-        background-color: #151515;
-        color: #ffffff;
-    }
-}
-
-.dark-theme {
-    background-color: #151515;
-    color: #ffffff
-}
-
-.dark-bw-theme {
-    background-color: #000000;
-    color: #ffffff
-}
-
-.light-bw-theme {
-    background-color: #ffffff;
-    color: #000000;
+  font-size: 15px;
 }
 
 .product {
-    display: none;
+  display: none;
 }
 
 @media screen and (width <=1200px) {
-    .left-margin-note {
-        position: inherit;
-        right: unset;
-        width: unset;
-        text-align: left;
-    }
+  .left-margin-note {
+    position: inherit;
+    right: unset;
+    width: unset;
+    text-align: left;
+  }
 
-    .margin-note {
-        position: unset;
-        display: unset;
-    }
+  .margin-note {
+    position: unset;
+    display: unset;
+  }
 
-    .margin-note::after {
-        content: " · ";
-    }
+  .margin-note::after {
+    content: " · ";
+    color: var(--margin-note-color);
+  }
 }
