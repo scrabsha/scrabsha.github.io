@@ -5,14 +5,14 @@
 #show: lib.page.with(title: title, date: published-date)
 
 #let description = [
-  I started working on the view_types (rust-lang/rust#155938) about a week ago. At first, I had no strong opinion on what view types should look like in terms of syntax. Well. Thinking about `view_types` for more than an hour per day every day is a good way to form strong opinions about the said `view_types`. I should have expected that, honestly.
+  I started working on view_types (rust-lang/rust#155938) about a week ago. At first, I had no strong opinion on what view types should look like in terms of syntax. Well. Thinking about `view_types` for more than an hour per day every day is a good way to form strong opinions about the said `view_types`. I should have expected that, honestly.
 ]
 
 #let rust-lang-ref(id) = {
   link("https://github.com/rust-lang/rust/issues/" + str(id))[rust-lang/rust\##id]
 }
 
-I started working on the `view_types` (#rust-lang-ref(155938)) about a week ago. At first, I had no strong opinion on what `view_types` should look like syntax-wise. I wanted to add basic support of `view_types` while the Lang Team discusses what it should look like, and just update my implementation every time they reach a concensus.
+I started working on `view_types` (#rust-lang-ref(155938)) about a week ago. At first, I had no strong opinion on what `view_types` should look like syntax-wise. I wanted to add basic support of `view_types` while the Lang Team discusses what it should look like, and just update my implementation every time they reach a concensus.
 
 Well. Thinking about `view_types` for more than an hour per day every day is a good way to form strong opinions about the said `view_types`. I should have expected that, honestly.
 
