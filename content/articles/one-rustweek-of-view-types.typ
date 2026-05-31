@@ -47,7 +47,7 @@ struct Foo {
 fn main() {
     let mut foo = Foo { meow: 42, nyya: 101 };
     let meow = &foo.meow;
-    copy(&mut foo as &mut Foo.{ nyya }, Foo { meow: 69, nyya: 69 });
+    copy(Foo { meow: 69, nyya: 69 }, &mut foo as &mut Foo.{ nyya });
     println!("{meow}");
 }
 ```
