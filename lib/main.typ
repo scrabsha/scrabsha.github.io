@@ -53,9 +53,10 @@
   }
 }
 
-#let env(key, default) = {
-  let env_ = toml("../.env")
-  env_.at(key, default: default)
+#let env = toml("../.env")
+
+#let get_env(key, default) = {
+  env.at(key, default: default)
 }
 
 #let page(
@@ -81,7 +82,7 @@
           href: "https://fonts.googleapis.com/css2?family=Libertinus+Serif:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&display=swap",
         )
 
-        if env("live-reload", false) {
+        if get_env("live-reload", false) {
           html.script(src: "https://kalabasa.github.io/simple-live-reload/script.js")
         }
 
@@ -112,10 +113,19 @@
           ]
         }
 
-        show par: it => meows(it, density: 8)
-        show heading: it => meows(it, density: 32)
+        {
+          show par: it => meows(it, density: 8)
+          show heading: it => meows(it, density: 32)
+          body
+        }
 
-        body
+        html.footer(style: "text-align: center")[
+          #emph[
+            #env.rss.copyright
+
+            NO Large Language Model has been used to write the posts in this blog or the implementation work it describes.
+          ]
+        ]
       })
     },
   )

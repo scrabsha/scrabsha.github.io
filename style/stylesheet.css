@@ -83,6 +83,15 @@ header {
   text-align: center;
 }
 
+footer {
+  margin-top: 3em;
+
+  & p {
+    margin: 0.5em;
+    line-height: 2rem;
+  }
+}
+
 h1,
 h2,
 h3,
