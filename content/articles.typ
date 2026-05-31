@@ -1,4 +1,5 @@
 #import "/lib/main.typ" as lib
+#import "/lib/articles.typ" as articles
 
 #show: lib.page.with()
 
@@ -9,17 +10,7 @@
 }
 
 #{
-  let content = read("articles/index.txt")
-
-  let articles = content
-    .split()
-    .map(article => {
-      let path = "articles/" + article
-      import path as article
-      (path, article)
-    })
-    .sorted(key: article => article.at(1).published-date)
-    .rev()
+  let articles = articles.articles
 
   for article in articles {
     let path = article.at(0)

@@ -18,8 +18,19 @@ articles := $(shell find $(articles_dir) -name '*.typ')
 css_files := $(shell find $(style_dir) -name '*.css' | sed 's|^$(style_dir)|$(target_dir)|')
 font_files := $(shell find $(fonts_dir) \( -name '*.woff2' -o -name '*.ttf' \) | sed 's|^$(fonts_dir)|$(target_dir)|')
 js_files := $(shell find $(js_dir) -name '*.js' | sed 's|^$(js_dir)|$(target_dir)|')
+rss := $(target_dir)/articles/rss.xml
 
-main: $(html_files) $(css_files) $(font_files) $(js_files)
+main: $(html_files) $(css_files) $(font_files) $(js_files) $(rss)
+
+$(rss): $(content_dir)/articles/*.typ lib
+	$(typst) query \
+		--features html \
+		--root . \
+		lib/articles.typ \
+		"<rss>" \
+		--field value \
+		--one \
+		| jq -r "." > $(rss)
 
 clean:
 	rm -rf $(target_dir) build
@@ -29,7 +40,7 @@ $(target_dir)/articles.html: $(articles) $(index)
 
 $(target_dir)/%.html: $(content_dir)/%.typ lib $(typst)
 	mkdir -p $(shell dirname $@)
-	touch .env
+	if [ ! -e ".env" ]; then cp env.toml.deploy .env; fi
 	$(typst) compile \
 	    --features html \
 	    --format html \
