@@ -12,7 +12,7 @@
 
 Not sure about the name tbh, French is "gâteau au yaourt". It's a super easy cake that u can use as a base. Be creative, add more stuff in it!
 
-= Ingredionts
+= Ingredients
 
 For #food.base-amount-scale(3) eggs:
 - #food.t45-flour[#scaled(200) g]
